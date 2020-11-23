@@ -7,6 +7,14 @@ module.exports = (client, message) => {
     message.delete();
   }
 
+  if (
+    message.author.id === '159985870458322944' &&
+    message.channel.id === process.env.LEVELS_CHANNEL
+  ) {
+    require('../handlers/levels-handler').handleMessage(message);
+    return;
+  }
+
   if (message.author.bot || message.system) return;
   if (message.guild.id !== process.env.GUILD_ID) return;
 
