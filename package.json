@@ -12,6 +12,7 @@
     "discord.js": "^12.4.1",
     "dotenv": "^8.2.0",
     "luxon": "^1.25.0",
+    "node-vk-bot-api": "^3.3.7",
     "readdir": "^1.0.2"
   },
   "scripts": {
