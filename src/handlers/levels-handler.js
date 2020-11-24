@@ -28,7 +28,6 @@ const sendMessage = (member, message, color = '#66ffad') => {
   const embed = new MessageEmbed()
     .setColor(color)
     .setAuthor(member.displayName, member.user.displayAvatarURL({ dynamic: true }))
-    .setThumbnail('')
     .setDescription(`**${message}**`)
     .setTimestamp();
 
@@ -41,6 +40,8 @@ const sendMessage = (member, message, color = '#66ffad') => {
 
 const giveLevelRole = async (member, level = 1, sendMsg = false) => {
   if (!member) throw new Error('Пользователь пропал');
+
+  if (member.roles.some(r => blacklistedRoles.includes(r.id))) return;
 
   const roleData =
     rolesByLevel.find(
@@ -71,8 +72,6 @@ const giveLevelRole = async (member, level = 1, sendMsg = false) => {
   }
 
   await member.roles.add(role, `Повышение уровня на ${level}`);
-  console.log(member.displayName, member.id, level);
-  console.log('Роль выдана\n');
   if (sendMsg) {
     sendMessage(
       member,
