@@ -20,6 +20,7 @@ module.exports = class extends Command {
 
     const players = leadersBoard.data.players;
 
+    // eslint-disable-next-line consistent-return
     players.forEach(async player => {
       const member = await message.guild.members.fetch(player.id);
       if (!member) return console.log('Нет юзера', player.id);
