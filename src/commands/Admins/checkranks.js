@@ -22,7 +22,7 @@ module.exports = class extends Command {
 
     // eslint-disable-next-line consistent-return
     players.forEach(async player => {
-      const member = await message.guild.members.fetch(player.id);
+      const member = message.guild.members.cache.get(player.id);
       if (!member) return console.log('Нет юзера', player.id);
       await giveLevelRole(member, player.level, false);
     });

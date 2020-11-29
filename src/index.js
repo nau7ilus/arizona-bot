@@ -9,6 +9,7 @@ const client = new Client({
   partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
   messageCacheLifetime: 60,
   messageSweepInterval: 120,
+  fetchAllMembers: true,
 });
 
 client.login();
