@@ -1,28 +1,10 @@
 'use strict';
 
 const { MessageEmbed } = require('discord.js');
+const { levelsConfig } = require('../utils/config');
 
-const rolesByLevel = [
-  { level: 1, roleID: '772869388155486253' },
-  { level: 10, roleID: '772869388155486254' },
-  { level: 15, roleID: '772869388155486255' },
-  { level: 20, roleID: '772869388155486256' },
-  { level: 30, roleID: '772869388155486257' },
-  { level: 40, roleID: '772869388155486258' },
-  { level: 50, roleID: '772869388163743844' },
-  { level: 55, roleID: '772869388163743845' },
-];
-
-const blacklistedRoles = [
-  '772869388331515950',
-  '772869388331515949',
-  '772869388331515948',
-  '772869388331515947',
-  '772869388310806572',
-  '772869388310806571',
-  '772869388310806570',
-  '772869388310806569',
-];
+const rolesByLevel = levelsConfig[process.env.GUILD_ID].rolesByLevel;
+const blacklistedRoles = levelsConfig[process.env.GUILD_ID].blacklistedRoles;
 
 const sendMessage = (member, message, color = '#66ffad') => {
   const embed = new MessageEmbed()
@@ -41,7 +23,7 @@ const sendMessage = (member, message, color = '#66ffad') => {
 const giveLevelRole = async (member, level = 1, sendMsg = false) => {
   if (!member) throw new Error('Пользователь пропал');
 
-  if (member.roles.some(r => blacklistedRoles.includes(r.id))) return;
+  if (member.roles.cache.some(r => blacklistedRoles.includes(r.id))) return;
 
   const roleData =
     rolesByLevel.find(
