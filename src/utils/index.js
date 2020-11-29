@@ -139,9 +139,9 @@ exports.missingPermsError = ({
               .setTitle(`**${emoji} | Произошла ошибка**`)
               .setDescription(
                 `**У ${isClient ? 'бота' : 'вас'} нехватает прав \`
-                      ${missingPerms.map(perm => exports.localizePerm(perm)).join(', ')}\` в канале <#${
-                  channel.id
-                }>**`,
+                      ${missingPerms
+                        .map(perm => exports.localizePerm(perm))
+                        .join(', ')}\` в канале <#${channel.id}>**`,
               )
           : `**\`[${emoji} | Ошибка] У бота нехватает прав '${missingPerms
               .map(perm => exports.localizePerm(perm))
