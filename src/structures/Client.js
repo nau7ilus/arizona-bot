@@ -12,6 +12,13 @@ module.exports = class AdvancedClient extends Client {
     this.developers = options.devs;
     this.prefix = options.prefix || '/';
 
+    this.players = {};
+    this.playersUpdate = {};
+
+    this.cooldown = {
+      support: new Set(),
+    };
+
     this.stores = new Collection();
     this.commands = new CommandStore(this);
 
@@ -30,9 +37,7 @@ module.exports = class AdvancedClient extends Client {
 
   async login(token) {
     const loaded = await Promise.all(
-      this.stores.map(
-        async store => `[Loader] Загружено ${await store.loadAll()} ${store.names[1]}.`,
-      ),
+      this.stores.map(async store => `[Loader] Загружено ${await store.loadAll()} ${store.names[1]}.`),
     ).catch(err => {
       console.error(err);
       process.exit();

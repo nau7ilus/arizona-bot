@@ -26,9 +26,8 @@ const giveLevelRole = async (member, level = 1, sendMsg = false) => {
   if (member.roles.cache.some(r => blacklistedRoles.includes(r.id))) return;
 
   const roleData =
-    rolesByLevel.find(
-      (j, i) => level >= j.level && rolesByLevel[i + 1] && level < rolesByLevel[i + 1].level,
-    ) || rolesByLevel[rolesByLevel.length - 1];
+    rolesByLevel.find((j, i) => level >= j.level && rolesByLevel[i + 1] && level < rolesByLevel[i + 1].level) ||
+    rolesByLevel[rolesByLevel.length - 1];
 
   if (!roleData) {
     throw new Error('Не удалось найти ID роли для выдачи для выдачи #1');
@@ -47,8 +46,7 @@ const giveLevelRole = async (member, level = 1, sendMsg = false) => {
   if (sendMsg && member.roles.cache.some(r => r.id === role.id)) {
     sendMessage(
       member,
-      `Поздравляем, вы получили ${level} уровень!\n` +
-        `С дальнейшем повышением уровня вы получите различные плюшки!`,
+      `Поздравляем, вы получили ${level} уровень!\n` + `С дальнейшем повышением уровня вы получите различные плюшки!`,
     );
     return;
   }
@@ -57,8 +55,7 @@ const giveLevelRole = async (member, level = 1, sendMsg = false) => {
   if (sendMsg) {
     sendMessage(
       member,
-      `Поздравляем, вы получили ${level} уровень!\n` +
-        `За общение в чате ты получаешь роль \`${role.name}\``,
+      `Поздравляем, вы получили ${level} уровень!\n` + `За общение в чате ты получаешь роль \`${role.name}\``,
       role.color,
     );
   }

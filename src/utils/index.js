@@ -5,15 +5,7 @@ const { DateTime } = require('luxon');
 
 exports.random = array => array[Math.floor(Math.random() * array.length)];
 
-exports.sendErrorMessage = ({
-  message,
-  content,
-  member,
-  emoji,
-  react = true,
-  color,
-  messageType = 'embed',
-}) => {
+exports.sendErrorMessage = ({ message, content, member, emoji, react = true, color, messageType = 'embed' }) => {
   if (!emoji) emoji = exports.random(['😥', '😔', '🤔', '⚠️', '⛔', '🚫']);
   if (react) message.react(emoji);
   message.channel
@@ -31,9 +23,9 @@ exports.sendErrorMessage = ({
 
 exports.onRunError = ({ client, warning, message }) => {
   console.warn(
-    `[GiveRole] [Warn] Произошла ошибка в коде создания запроса Время: ${DateTime.local().toFormat(
-      'TT',
-    )}\nОшибка: ${warning.stack}`,
+    `[GiveRole] [Warn] Произошла ошибка в коде создания запроса Время: ${DateTime.local().toFormat('TT')}\nОшибка: ${
+      warning.stack
+    }`,
   );
 
   // Если автор команды - разработчик, отправить информацию об ошибке, иначе просто факт
@@ -55,10 +47,7 @@ exports.onRunError = ({ client, warning, message }) => {
           ].join('\n'),
         )
         .addField('**Сообщение:**', messageToString)
-        .addField(
-          '**Ошибка**',
-          warning.stack.length > 1024 ? `${warning.stack.substring(0, 1021)}...` : warning.stack,
-        ),
+        .addField('**Ошибка**', warning.stack.length > 1024 ? `${warning.stack.substring(0, 1021)}...` : warning.stack),
     );
   } else {
     return message.channel.send(
@@ -120,14 +109,7 @@ exports.localizePerm = perm => {
   return russianNames[perm];
 };
 
-exports.missingPermsError = ({
-  message,
-  channel,
-  missingPerms,
-  emoji = '🔇',
-  react = true,
-  isClient = true,
-}) => {
+exports.missingPermsError = ({ message, channel, missingPerms, emoji = '🔇', react = true, isClient = true }) => {
   const canIgnore = message.channel.id !== channel.id;
   if (!missingPerms.includes('ADD_REACTIONS') || (canIgnore && !react)) message.react(emoji);
   if (!missingPerms.includes('SEND_MESSAGES') || canIgnore) {
@@ -139,9 +121,7 @@ exports.missingPermsError = ({
               .setTitle(`**${emoji} | Произошла ошибка**`)
               .setDescription(
                 `**У ${isClient ? 'бота' : 'вас'} нехватает прав \`
-                      ${missingPerms
-                        .map(perm => exports.localizePerm(perm))
-                        .join(', ')}\` в канале <#${channel.id}>**`,
+                      ${missingPerms.map(perm => exports.localizePerm(perm)).join(', ')}\` в канале <#${channel.id}>**`,
               )
           : `**\`[${emoji} | Ошибка] У бота нехватает прав '${missingPerms
               .map(perm => exports.localizePerm(perm))

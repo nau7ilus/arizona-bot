@@ -9,7 +9,7 @@ module.exports = class extends Command {
     super(...args, {
       name: 'checkranks',
       devOnly: true,
-      userPermissions: ['ADMINISTATOR'],
+      userPermissions: ['ADMINISTRATOR'],
     });
   }
   async run({ args, message }) {
@@ -20,11 +20,10 @@ module.exports = class extends Command {
 
     const players = leadersBoard.data.players;
 
-    // eslint-disable-next-line consistent-return
-    players.forEach(async player => {
+    players.forEach(player => {
       const member = message.guild.members.cache.get(player.id);
       if (!member) return console.log('Нет юзера', player.id);
-      await giveLevelRole(member, player.level, false);
+      return giveLevelRole(member, player.level, false);
     });
   }
 };
