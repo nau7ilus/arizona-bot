@@ -3,19 +3,15 @@
 
 const { MessageEmbed } = require('discord.js');
 
-const allSettings = require('../utils/config').supportSettings;
+const supportConfig = require('../utils/config').supportSettings;
 
 // eslint-disable-next-line consistent-return
-exports.checkMainMessage = async client => {
+exports.checkMainMessage = client => {
+  Object.entries(supportConfig).forEach(async guildSettings => {
+    const [guildID, settings] = guildSettings;
+    if (!settings || !guildID) return console.error('Нет настроек #1');
 
-  Object.entries(allSettings).forEach(v => {
-    const guildid = v[0];
-    const settings = v[1];
-
-
-    if (!settings) return console.error('Нет настроек #1');
-
-    const guild = client.guilds.cache.get(guildid);
+    const guild = client.guilds.cache.get(guildID);
     if (!guild) return console.error('Сервер не найден #2');
 
     const channel = guild.channels.cache.get(settings.channelID);
@@ -43,10 +39,9 @@ exports.checkMainMessage = async client => {
 
     msg.react('✏️');
   });
-
 };
 
-exports.createTicket = async (client, reaction, reactedUser) => {
+exports.createTicket = async (client, reaction, reactedUser, settings) => {
   const { message } = reaction;
 
   if (client.cooldown.support.has(reactedUser.id)) {
@@ -112,7 +107,7 @@ exports.createTicket = async (client, reaction, reactedUser) => {
   }
 };
 
-exports.action = (message, member, action) => {
+exports.action = (message, member, action, settings) => {
   // Check user perms
   if (!member.hasPermission('ADMINISTRATOR') && !member.roles.cache.some(r => settings.moderators.includes(r.id))) {
     return sendError(message.channel, member, 'у вас нет прав на использование этой команды', 3000);
@@ -145,8 +140,10 @@ exports.action = (message, member, action) => {
 
     message.channel.send(logEmbed(message.channel, member, action));
 
-    // const logChannel = message.guild.channels.cache.get(settings.logChannel);
-    // logChannel.send(logEmbed(message.channel, member, action, true));
+    const logChannel = message.guild.channels.cache.get(settings.logChannel);
+    if (logChannel) {
+      logChannel.send(logEmbed(message.channel, member, action, true));
+    }
   } catch (err) {
     console.error(err);
     sendError(message.channel, member, 'произошла ошибка при изменении статуса тикета');
@@ -177,29 +174,29 @@ function logEmbed(channel, member, action, field = false) {
 }
 
 exports.handleReactions = (client, reaction, reactedUser) => {
-  const settings = allSettings[reaction.message.guild.id];
+  const settings = supportConfig[reaction.message.guild.id];
   if (!settings) return;
 
   const { message } = reaction;
   const member = message.guild.member(reactedUser);
   const isSupport = message.channel.id === settings.channelID;
 
-  if (reaction.emoji.name === '✏️' && isSupport) exports.createTicket(client, reaction, reactedUser);
-  else if (reaction.emoji.name === '🔒') exports.action(message, member, 'close');
-  else if (reaction.emoji.name === '📌') exports.action(message, member, 'hold');
-  else if (reaction.emoji.name === '📬') exports.action(message, member, 'active');
+  if (reaction.emoji.name === '✏️' && isSupport) exports.createTicket(client, reaction, reactedUser, settings);
+  else if (reaction.emoji.name === '🔒') exports.action(message, member, 'close', settings);
+  else if (reaction.emoji.name === '📌') exports.action(message, member, 'hold', settings);
+  else if (reaction.emoji.name === '📬') exports.action(message, member, 'active', settings);
 
   reaction.users.remove(reactedUser);
 };
 
-exports.watchTickets = async client => {
-  Object.entries(allSettings).forEach(v => {
-    const guildid = v[0];
-    const settings = v[1];
+exports.watchTickets = client => {
+  Object.entries(supportConfig).forEach(async guildSettings => {
+    const [guildID, settings] = guildSettings;
+    if (!settings || !guildID) return console.error('Нет настроек #1');
 
     if (!settings) return console.error('Нет настроек #100');
 
-    const guild = client.guilds.cache.get(guildid);
+    const guild = client.guilds.cache.get(guildID);
     if (!guild) return console.error('Сервер не найден #200');
 
     const category = guild.channels.cache.get(settings.categories.close);

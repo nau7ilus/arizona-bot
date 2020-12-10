@@ -114,7 +114,6 @@ module.exports = class extends Command {
       return this.sendError(message, 'Настройки для этого сервера не установлены');
     }
 
-
     // Check if member is moderator
     const isModer =
       message.member.hasPermission('ADMINISTRATOR') ||
@@ -129,8 +128,8 @@ module.exports = class extends Command {
     const fractionIDs = isModer
       ? [args[0]]
       : Object.entries(settings.fractionsByRoles).filter(r =>
-        message.member.roles.cache.some(i => r[1].includes(i.id)),
-      );
+          message.member.roles.cache.some(i => r[1].includes(i.id)),
+        );
 
     // If user has not any fraction to show online
     if (!isModer && !fractionIDs.length) {
@@ -169,16 +168,17 @@ module.exports = class extends Command {
           .setTitle(`**${titles[fractionID]}**`)
           .setColor(colors[fractionID])
           .setDescription(
-            `**\`\`\`Всего людей во фракции: ${PEOPLE(
-              players.length,
-            )}\nОнлайн на данный момент: ${PEOPLE(membersOnline)}\nИз которых руководство: ${PEOPLE(
+            `**\`\`\`Всего людей во фракции: ${PEOPLE(players.length)}\nОнлайн на данный момент: ${PEOPLE(
+              membersOnline,
+            )}\nИз которых руководство: ${PEOPLE(
               seniors.filter(i => i.online).length,
             )}\`\`\`\nРуководство:\`\`\`diff\n${seniors
               .sort((a, b) => b.rank - a.rank)
               .map(
                 m =>
-                  `${m.online ? '+' : '-'} ${m.nickname} - ${m.rank === 10 ? 'Лидер' : 'Заместитель'
-                  } - ${m.online ? 'В игре' : 'Оффлайн'}`,
+                  `${m.online ? '+' : '-'} ${m.nickname} - ${m.rank === 10 ? 'Лидер' : 'Заместитель'} - ${
+                    m.online ? 'В игре' : 'Оффлайн'
+                  }`,
               )
               .join('\n')}\`\`\`**`,
           ),
@@ -190,18 +190,14 @@ module.exports = class extends Command {
 
   async awaitFractions(message, fractionIDs) {
     const fractions = this._fractionsToArray(fractionIDs);
-    const msg = await message.channel.send(
-      message.member,
-      this._createChooseMenu(this._formatFractionIDs(fractions)),
-    );
+    const msg = await message.channel.send(message.member, this._createChooseMenu(this._formatFractionIDs(fractions)));
     console.log(this._formatFractionIDs(fractions));
     for (const [i] of fractions.slice(0, 11).entries()) {
       msg.react(numbers[i]);
     }
     msg.react('🆗');
 
-    const filter = reaction =>
-      reaction.emoji.name === '🆗' || numbers.includes(reaction.emoji.name);
+    const filter = reaction => reaction.emoji.name === '🆗' || numbers.includes(reaction.emoji.name);
     const collector = msg.createReactionCollector(filter, { time: 60000 });
 
     collector.on('collect', (reaction, user) => {
@@ -268,9 +264,7 @@ module.exports = class extends Command {
   _formatFractionIDs(fractions) {
     return `\`\`\`diff\n${fractions
       .map(
-        (j, i) =>
-          `${j.isSelected ? '+ ' : ''}[${i}] ${j.id === 0 ? 'Выбрать все фракции\n' : fractionNames[j.id - 1]
-          }`,
+        (j, i) => `${j.isSelected ? '+ ' : ''}[${i}] ${j.id === 0 ? 'Выбрать все фракции\n' : fractionNames[j.id - 1]}`,
       )
       .join('\n')}\`\`\``;
   }

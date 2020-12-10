@@ -3,7 +3,6 @@
 const { MessageEmbed } = require('discord.js');
 const { levelsConfig } = require('../utils/config');
 
-
 const sendMessage = (member, message, color = '#66ffad') => {
   if (!levelsConfig[message.guild.id]) return;
 
@@ -51,7 +50,7 @@ const giveLevelRole = async (member, level = 1, sendMsg = false) => {
   if (sendMsg && member.roles.cache.some(r => r.id === role.id)) {
     sendMessage(
       member,
-      `Поздравляем, вы получили ${level} уровень!\n` + `С дальнейшем повышением уровня вы получите различные плюшки!`,
+      `Поздравляем, вы получили ${level} уровень!\nС дальнейшем повышением уровня вы получите различные плюшки!`,
     );
     return;
   }
@@ -78,4 +77,4 @@ const handleMessage = async message => {
   await giveLevelRole(member, level, true);
 };
 
-module.exports = { rolesByLevel, giveLevelRole, handleMessage };
+module.exports = { giveLevelRole, handleMessage };
