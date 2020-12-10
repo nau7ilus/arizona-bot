@@ -6,7 +6,7 @@ const plural = require('plural-ru');
 
 const { getOnline } = require('../../handlers/online');
 const Command = require('../../structures/Command');
-const settings = require('../../utils/config').onlineSettings[process.env.GUILD_ID];
+const allSettings = require('../../utils/config').onlineSettings;
 
 const numbers = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'];
 const PEOPLE = key => plural(key, `%d человек`, `%d человека`, `%d человек`);
@@ -109,9 +109,11 @@ module.exports = class extends Command {
   }
   async run({ args, message }) {
     // Check settings for guild
+    const settings = allSettings[message.guild.id];
     if (!settings) {
       return this.sendError(message, 'Настройки для этого сервера не установлены');
     }
+
 
     // Check if member is moderator
     const isModer =
@@ -127,8 +129,8 @@ module.exports = class extends Command {
     const fractionIDs = isModer
       ? [args[0]]
       : Object.entries(settings.fractionsByRoles).filter(r =>
-          message.member.roles.cache.some(i => r[1].includes(i.id)),
-        );
+        message.member.roles.cache.some(i => r[1].includes(i.id)),
+      );
 
     // If user has not any fraction to show online
     if (!isModer && !fractionIDs.length) {
@@ -147,6 +149,10 @@ module.exports = class extends Command {
   }
 
   async showOnline(message, mentionMember, fractionIDs, edit = false) {
+    const settings = allSettings[message.guild.id];
+
+    if (!settings) return;
+
     const embeds = [];
     for await (const fractionID of fractionIDs) {
       const players = await getOnline(message.client, {
@@ -171,8 +177,7 @@ module.exports = class extends Command {
               .sort((a, b) => b.rank - a.rank)
               .map(
                 m =>
-                  `${m.online ? '+' : '-'} ${m.nickname} - ${
-                    m.rank === 10 ? 'Лидер' : 'Заместитель'
+                  `${m.online ? '+' : '-'} ${m.nickname} - ${m.rank === 10 ? 'Лидер' : 'Заместитель'
                   } - ${m.online ? 'В игре' : 'Оффлайн'}`,
               )
               .join('\n')}\`\`\`**`,
@@ -264,8 +269,7 @@ module.exports = class extends Command {
     return `\`\`\`diff\n${fractions
       .map(
         (j, i) =>
-          `${j.isSelected ? '+ ' : ''}[${i}] ${
-            j.id === 0 ? 'Выбрать все фракции\n' : fractionNames[j.id - 1]
+          `${j.isSelected ? '+ ' : ''}[${i}] ${j.id === 0 ? 'Выбрать все фракции\n' : fractionNames[j.id - 1]
           }`,
       )
       .join('\n')}\`\`\``;

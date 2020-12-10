@@ -1,7 +1,6 @@
 'use strict';
 
 module.exports = async (client, oldState, newState) => {
-  if (oldState.guild.id !== process.env.GUILD_ID) return;
   if (oldState.channelID === newState.channelID) return;
 
   if (newState.channel) {

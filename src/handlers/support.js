@@ -3,39 +3,47 @@
 
 const { MessageEmbed } = require('discord.js');
 
-const settings = require('../utils/config').supportSettings[process.env.GUILD_ID];
+const allSettings = require('../utils/config').supportSettings;
 
 // eslint-disable-next-line consistent-return
 exports.checkMainMessage = async client => {
-  if (!settings) return console.error('Нет настроек #1');
 
-  const guild = client.guilds.cache.get(process.env.GUILD_ID);
-  if (!guild) return console.error('Сервер не найден #2');
+  Object.entries(allSettings).forEach(v => {
+    const guildid = v[0];
+    const settings = v[1];
 
-  const channel = guild.channels.cache.get(settings.channelID);
-  if (!channel) return console.error('Канал не найден #3');
 
-  const messages = await channel.messages.fetch({ limit: 1 });
-  if (!messages.size || messages.first().author.id !== client.user.id) {
-    await channel.bulkDelete(10);
-  } else if (messages.first().author.id === client.user.id) {
-    const msg = messages.first();
-    if (msg.reactions.cache.size !== 1 || !msg.reactions.cache.some(r => r.emoji !== '✏️')) {
-      await msg.reactions.removeAll();
-      return msg.react('✏️');
+    if (!settings) return console.error('Нет настроек #1');
+
+    const guild = client.guilds.cache.get(guildid);
+    if (!guild) return console.error('Сервер не найден #2');
+
+    const channel = guild.channels.cache.get(settings.channelID);
+    if (!channel) return console.error('Канал не найден #3');
+
+    const messages = await channel.messages.fetch({ limit: 1 });
+    if (!messages.size || messages.first().author.id !== client.user.id) {
+      await channel.bulkDelete(10);
+    } else if (messages.first().author.id === client.user.id) {
+      const msg = messages.first();
+      if (msg.reactions.cache.size !== 1 || !msg.reactions.cache.some(r => r.emoji !== '✏️')) {
+        await msg.reactions.removeAll();
+        return msg.react('✏️');
+      }
+      // eslint-disable-next-line consistent-return
+      return;
     }
-    // eslint-disable-next-line consistent-return
-    return;
-  }
-  const msg = await channel.send(
-    new MessageEmbed()
-      .setColor(0xf54278)
-      .setTitle('**📝 Рады приветствовать вас в канале поддержки!**')
-      .setDescription(`**${settings.phrases.mainMessage}**`)
-      .setFooter('Для создания канала, нажмите на реакцию ниже'),
-  );
+    const msg = await channel.send(
+      new MessageEmbed()
+        .setColor(0xf54278)
+        .setTitle('**📝 Рады приветствовать вас в канале поддержки!**')
+        .setDescription(`**${settings.phrases.mainMessage}**`)
+        .setFooter('Для создания канала, нажмите на реакцию ниже'),
+    );
 
-  msg.react('✏️');
+    msg.react('✏️');
+  });
+
 };
 
 exports.createTicket = async (client, reaction, reactedUser) => {
@@ -55,7 +63,7 @@ exports.createTicket = async (client, reaction, reactedUser) => {
     return sendError(
       message.channel,
       reactedUser,
-      `У вас уже есть активный тикет [(перейти в канал)](${getChannelURL(activeTickets.first().id)})`,
+      `У вас уже есть активный тикет [(перейти в канал)](${getChannelURL(message.guild.id, activeTickets.first().id)})`,
       { embed: true },
     );
   }
@@ -92,7 +100,7 @@ exports.createTicket = async (client, reaction, reactedUser) => {
         new MessageEmbed()
           .setColor(0x84f542)
           .setTitle('**Создание тикета**')
-          .setDescription(`**Канал успешно создан! [Перейти](${getChannelURL(ticketChannel.id)})**`),
+          .setDescription(`**Канал успешно создан! [Перейти](${getChannelURL(message.guild.id, ticketChannel.id)})**`),
       )
       .then(_msg => _msg.delete({ timeout: 5000 }));
 
@@ -169,11 +177,12 @@ function logEmbed(channel, member, action, field = false) {
 }
 
 exports.handleReactions = (client, reaction, reactedUser) => {
+  const settings = allSettings[reaction.message.guild.id];
+  if (!settings) return;
+
   const { message } = reaction;
   const member = message.guild.member(reactedUser);
   const isSupport = message.channel.id === settings.channelID;
-
-  if (message.guild.id !== process.env.GUILD_ID) return;
 
   if (reaction.emoji.name === '✏️' && isSupport) exports.createTicket(client, reaction, reactedUser);
   else if (reaction.emoji.name === '🔒') exports.action(message, member, 'close');
@@ -184,34 +193,39 @@ exports.handleReactions = (client, reaction, reactedUser) => {
 };
 
 exports.watchTickets = async client => {
-  if (!settings) return console.error('Нет настроек #100');
+  Object.entries(allSettings).forEach(v => {
+    const guildid = v[0];
+    const settings = v[1];
 
-  const guild = client.guilds.cache.get(process.env.GUILD_ID);
-  if (!guild) return console.error('Сервер не найден #200');
+    if (!settings) return console.error('Нет настроек #100');
 
-  const category = guild.channels.cache.get(settings.categories.close);
-  if (!category) return console.error('Категория не найдена #300');
+    const guild = client.guilds.cache.get(guildid);
+    if (!guild) return console.error('Сервер не найден #200');
 
-  for await (const channel of category.children.array()) {
-    const lastMessages = await channel.messages.fetch({ limit: 1 });
-    if (lastMessages && lastMessages.first()) {
-      const msg = lastMessages.first();
+    const category = guild.channels.cache.get(settings.categories.close);
+    if (!category) return console.error('Категория не найдена #300');
 
-      if (Date.now() - msg.createdAt >= settings.deleteAfter) {
+    for await (const channel of category.children.array()) {
+      const lastMessages = await channel.messages.fetch({ limit: 1 });
+      if (lastMessages && lastMessages.first()) {
+        const msg = lastMessages.first();
+
+        if (Date.now() - msg.createdAt >= settings.deleteAfter) {
+          channel.delete('Очищение категории с закрытыми жалобами');
+        }
+      } else {
         channel.delete('Очищение категории с закрытыми жалобами');
       }
-    } else {
-      channel.delete('Очищение категории с закрытыми жалобами');
     }
-  }
+  });
 };
 
 function switchKeys(obj) {
   return Object.fromEntries(Object.entries(obj).map(e => [e[1], e[0]]));
 }
 
-function getChannelURL(channelID) {
-  return `https://discord.com/channels/${process.env.GUILD_ID}/${channelID}`;
+function getChannelURL(guildID, channelID) {
+  return `https://discord.com/channels/${guildID}/${channelID}`;
 }
 
 function getTicketID(id) {

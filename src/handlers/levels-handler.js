@@ -3,10 +3,10 @@
 const { MessageEmbed } = require('discord.js');
 const { levelsConfig } = require('../utils/config');
 
-const rolesByLevel = levelsConfig[process.env.GUILD_ID].rolesByLevel;
-const blacklistedRoles = levelsConfig[process.env.GUILD_ID].blacklistedRoles;
 
 const sendMessage = (member, message, color = '#66ffad') => {
+  if (!levelsConfig[message.guild.id]) return;
+
   const embed = new MessageEmbed()
     .setColor(color)
     .setAuthor(member.displayName, member.user.displayAvatarURL({ dynamic: true }))
@@ -21,6 +21,11 @@ const sendMessage = (member, message, color = '#66ffad') => {
 };
 
 const giveLevelRole = async (member, level = 1, sendMsg = false) => {
+  if (!levelsConfig[member.guild.id]) return;
+
+  const rolesByLevel = levelsConfig[member.guild.id].rolesByLevel;
+  const blacklistedRoles = levelsConfig[member.guild.id].blacklistedRoles;
+
   if (!member) throw new Error('Пользователь пропал');
 
   if (member.roles.cache.some(r => blacklistedRoles.includes(r.id))) return;
@@ -62,6 +67,8 @@ const giveLevelRole = async (member, level = 1, sendMsg = false) => {
 };
 
 const handleMessage = async message => {
+  if (!levelsConfig[member.guild.id]) return;
+
   const member = message.mentions.members.first();
   const level = +message.content.split('|')[1];
 

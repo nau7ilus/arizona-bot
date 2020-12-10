@@ -3,7 +3,7 @@
 const { MessageEmbed } = require('discord.js');
 const plural = require('plural-ru');
 const Command = require('../../structures/Command');
-const meetingConfig = require('../../utils/config').meetingConfig[process.env.GUILD_ID];
+const allMeetingConfig = require('../../utils/config').meetingConfig;
 
 const PEOPLE = key => plural(key, `%d человек`, `%d человека`, `%d человек`);
 
@@ -16,6 +16,9 @@ module.exports = class extends Command {
 
   // eslint-disable-next-line consistent-return
   async run({ message }) {
+    const meetingConfig = allMeetingConfig[message.guild.id];
+    if (!meetingConfig) return;
+
     // Проверка наличия конфига
     if (!meetingConfig) {
       return this.sendError(message, 'Настройки для этого сервера не найдены');
