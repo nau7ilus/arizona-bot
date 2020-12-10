@@ -1,9 +1,10 @@
+/* eslint-disable consistent-return */
 'use strict';
 
 const { MessageEmbed } = require('discord.js');
 const plural = require('plural-ru');
 const Command = require('../../structures/Command');
-const meetingConfig = require('../../utils/config').meetingConfig[process.env.GUILD_ID];
+const allMeetingConfig = require('../../utils/config').meetingConfig;
 
 const PEOPLE = key => plural(key, `%d человек`, `%d человека`, `%d человек`);
 
@@ -16,6 +17,9 @@ module.exports = class extends Command {
 
   // eslint-disable-next-line consistent-return
   async run({ message }) {
+    const meetingConfig = allMeetingConfig[message.guild.id];
+    if (!meetingConfig) return;
+
     // Проверка наличия конфига
     if (!meetingConfig) {
       return this.sendError(message, 'Настройки для этого сервера не найдены');
@@ -23,10 +27,7 @@ module.exports = class extends Command {
 
     // Проверить, есть ли пользователь в голосовом канале
     if (!message.member.voice.channelID) {
-      return this.sendError(
-        message,
-        'Для использования команды, вы должны быть в голосовом канале',
-      );
+      return this.sendError(message, 'Для использования команды, вы должны быть в голосовом канале');
     }
 
     // Поиск настроек для канала, в котором находится пользователь
@@ -91,9 +92,7 @@ module.exports = class extends Command {
               message.member.voice.channel.members.size,
             )}\nНа собрании отсутствует: ${PEOPLE(
               truants.length + allowedTruancy.length,
-            )}\nИз которых отписали в канал: ${PEOPLE(
-              allowedTruancy.length,
-            )}\`\`\`\nПрогульщики:\n${truants
+            )}\nИз которых отписали в канал: ${PEOPLE(allowedTruancy.length)}\`\`\`\nПрогульщики:\n${truants
               .map(m => `${m.toString()} \`(${m.displayName})\``)
               .join('\n')}**`,
           ),
@@ -102,9 +101,7 @@ module.exports = class extends Command {
       const members = {};
 
       message.member.voice.channel.members.forEach(m => {
-        const role = m.roles.cache.find(r =>
-          [...settings.userRoles, ...settings.manageRoles].includes(r.id),
-        );
+        const role = m.roles.cache.find(r => [...settings.userRoles, ...settings.manageRoles].includes(r.id));
 
         if (!members[role ? role.name : -1]) {
           members[role ? role.name : -1] = [];
@@ -124,9 +121,9 @@ module.exports = class extends Command {
               .reverse()
               .map(
                 i =>
-                  `\n\n\`\`\`${+i[0] === -1 ? 'Остальные' : i[0]} - ${PEOPLE(
-                    i[1].length,
-                  )}\`\`\`${i[1].map(m => `${m.toString()} \`${m.displayName}\``).join('\n')}`,
+                  `\n\n\`\`\`${+i[0] === -1 ? 'Остальные' : i[0]} - ${PEOPLE(i[1].length)}\`\`\`${i[1]
+                    .map(m => `${m.toString()} \`${m.displayName}\``)
+                    .join('\n')}`,
               )}**`,
           ),
       );
@@ -134,10 +131,7 @@ module.exports = class extends Command {
   }
 
   isManager(member, manageRoles) {
-    return (
-      member.hasPermission('ADMINISTRATOR') ||
-      member.roles.cache.some(r => manageRoles.includes(r.id))
-    );
+    return member.hasPermission('ADMINISTRATOR') || member.roles.cache.some(r => manageRoles.includes(r.id));
   }
 
   sendWarning(message, content = 'Неизвестная ошибка') {

@@ -11,7 +11,6 @@ module.exports = class extends Command {
   }
   // eslint-disable-next-line require-await
   async run({ message }) {
-    if (message.guild.id !== process.env.GUILD_ID) return;
     action(message, message.member, 'active');
   }
 };

@@ -16,7 +16,6 @@ module.exports = (client, message) => {
   }
 
   if (message.author.bot || message.system) return;
-  if (message.guild.id !== process.env.GUILD_ID) return;
 
   // Получаем префикс бота из базы данных. По умолчанию '/'
   if (!message.content.startsWith('/')) return;
@@ -76,10 +75,9 @@ module.exports = (client, message) => {
       }
     } else {
       console.log(
-        `[Message] ${message.author.tag} использовал команду ${cmd.name} ${
-          message.guild
-            ? `на сервере ${message.guild.name} в канале ${message.channel.name}`
-            : `в личных сообщениях`
+        `[Message] ${message.author.tag} использовал команду ${cmd.name} ${message.guild
+          ? `на сервере ${message.guild.name} в канале ${message.channel.name}`
+          : `в личных сообщениях`
         }`,
       );
 

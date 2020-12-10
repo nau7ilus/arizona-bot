@@ -14,9 +14,7 @@ module.exports = class extends Command {
   }
   async run({ args, message }) {
     const page = args[0] || 0;
-    const leadersBoard = await get(
-      `https://mee6.xyz/api/plugins/levels/leaderboard/${process.env.GUILD_ID}?page=${page}`,
-    );
+    const leadersBoard = await get(`https://mee6.xyz/api/plugins/levels/leaderboard/${message.guild.id}?page=${page}`);
 
     const players = leadersBoard.data.players;
 
