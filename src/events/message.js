@@ -12,7 +12,6 @@ module.exports = (client, message) => {
   }
 
   if (message.author.bot || message.system || !message.guild) return;
-  if (message.guild.id !== process.env.GUILD_ID) return;
 
   // Получаем префикс бота из базы данных. По умолчанию '/'
   if (!message.content.startsWith('/')) return;
@@ -48,56 +47,36 @@ module.exports = (client, message) => {
       return;
     }
 
-    // Если нет сервера и команда была использована в ЛС
-    if (!message.guild) {
-      console.log(`[Message] ${message.author.tag} использовал команду ${cmd.name} в ЛС`);
+    console.log(
+      `[Message] ${message.author.tag} использовал команду ${cmd.name} ${
+        message.guild ? `на сервере ${message.guild.name} в канале ${message.channel.name}` : `в личных сообщениях`
+      }`,
+    );
 
-      // Если команда требует использования на сервере, написать ошибку
-      if (cmd.guildOnly) {
-        sendErrorMessage({
-          message,
-          content: 'эта команда доступна только на сервере',
-          member: message.member,
-        });
-        console.log(
-          '[Message] %s использовал команду %s. Ошибка: команда доступна только на сервере.',
-          message.author.tag,
-          cmd.name,
-        );
-        return;
+    // Проверяем наличие прав у пользователя/бота (TODO: необходим рефакторинг)
+    const has = Object.prototype.hasOwnProperty;
+    if (has.call(cmd, 'userPermissions')) {
+      const missingPerms = checkPermissions(message.channel, cmd.userPermissions, message.member);
+      if (missingPerms.length > 0) {
+        missingPermsError({ message, channel: message.channel, missingPerms, isClient: false });
       }
-    } else {
-      console.log(
-        `[Message] ${message.author.tag} использовал команду ${cmd.name} ${
-          message.guild ? `на сервере ${message.guild.name} в канале ${message.channel.name}` : `в личных сообщениях`
-        }`,
-      );
+    }
+    if (has.call(cmd, 'clientPermissions')) {
+      const missingPerms = checkPermissions(message.channel, cmd.userPermissions, message.member);
+      if (missingPerms.length > 0) {
+        missingPermsError({ message, channel: message.channel, missingPerms });
+      }
+    }
 
-      // Проверяем наличие прав у пользователя/бота (TODO: необходим рефакторинг)
-      const has = Object.prototype.hasOwnProperty;
-      if (has.call(cmd, 'userPermissions')) {
-        const missingPerms = checkPermissions(message.channel, cmd.userPermissions, message.member);
-        if (missingPerms.length > 0) {
-          missingPermsError({ message, channel: message.channel, missingPerms, isClient: false });
-        }
-      }
-      if (has.call(cmd, 'clientPermissions')) {
-        const missingPerms = checkPermissions(message.channel, cmd.userPermissions, message.member);
-        if (missingPerms.length > 0) {
-          missingPermsError({ message, channel: message.channel, missingPerms });
-        }
-      }
-
-      // Если команда требует NSFW у канала, а его нет, отправить ошибку
-      if (cmd.nsfw && !message.channel.nsfw) {
-        sendErrorMessage({
-          message,
-          content: 'эта команда доступна только в NSFW каналах',
-          member: message.member,
-          emoji: '🔞',
-        });
-        return;
-      }
+    // Если команда требует NSFW у канала, а его нет, отправить ошибку
+    if (cmd.nsfw && !message.channel.nsfw) {
+      sendErrorMessage({
+        message,
+        content: 'эта команда доступна только в NSFW каналах',
+        member: message.member,
+        emoji: '🔞',
+      });
+      return;
     }
 
     cmd.run({ client, message, args }).catch(warning => onRunError({ warning, client, message }));
