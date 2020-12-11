@@ -155,7 +155,12 @@ exports.action = (message, member, action, settings) => {
 };
 
 function logEmbed(channel, member, action, field = false) {
-  const titles = { create: '✏️┃ Создание тикета', active: '📬┃ Открытие тикета', hold: '📌┃ Закрепление тикета', close: '🔒┃ Закрытие тикета' };
+  const titles = {
+    create: '✏️┃ Создание тикета',
+    active: '📬┃ Открытие тикета',
+    hold: '📌┃ Закрепление тикета',
+    close: '🔒┃ Закрытие тикета',
+  };
   const colors = { create: 0x84f542, active: 0xc1ff45, hold: 0xffc240, close: 0xff5145 };
   const phrases = { create: 'создал', active: 'открыл', hold: 'закрепил', close: 'закрыл' };
 
@@ -168,7 +173,7 @@ function logEmbed(channel, member, action, field = false) {
 
   if (field) {
     embed
-      .addField(action != 'create' ? '**Модератор**' : '**Пользователь**', `**${member}**`, true)
+      .addField(action !== 'create' ? '**Модератор**' : '**Пользователь**', `**${member}**`, true)
       .addField('**Тикет**', `**${channel} [${channel.name}]**`, true);
   } else {
     embed.setDescription(`**Модератор ${member} ${phrases[action]} тикет ${channel} [${channel.name}]**`);
