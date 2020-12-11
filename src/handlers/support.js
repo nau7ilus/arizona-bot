@@ -99,6 +99,10 @@ exports.createTicket = async (client, reaction, reactedUser, settings) => {
       )
       .then(_msg => _msg.delete({ timeout: 5000 }));
 
+    const logChannel = message.guild.channels.cache.get(settings.logChannelID);
+    if (logChannel) {
+      logChannel.send(logEmbed(ticketChannel, reactedUser, 'create', true));
+    }
     client.cooldown.support.add(reactedUser.id);
     setTimeout(() => client.cooldown.support.delete(reactedUser.id), settings.cooldown);
   } catch (err) {
@@ -140,7 +144,7 @@ exports.action = (message, member, action, settings) => {
 
     message.channel.send(logEmbed(message.channel, member, action));
 
-    const logChannel = message.guild.channels.cache.get(settings.logChannel);
+    const logChannel = message.guild.channels.cache.get(settings.logChannelID);
     if (logChannel) {
       logChannel.send(logEmbed(message.channel, member, action, true));
     }
@@ -151,9 +155,14 @@ exports.action = (message, member, action, settings) => {
 };
 
 function logEmbed(channel, member, action, field = false) {
-  const titles = { active: '📬┃ Открытие тикета', hold: '📌┃ Закрепление тикета', close: '🔒┃ Закрытие тикета' };
-  const colors = { active: 0xc1ff45, hold: 0xffc240, close: 0xff5145 };
-  const phrases = { active: 'открыл', hold: 'закрепил', close: 'закрыл' };
+  const titles = {
+    create: '✏️┃ Создание тикета',
+    active: '📬┃ Открытие тикета',
+    hold: '📌┃ Закрепление тикета',
+    close: '🔒┃ Закрытие тикета',
+  };
+  const colors = { create: 0x84f542, active: 0xc1ff45, hold: 0xffc240, close: 0xff5145 };
+  const phrases = { create: 'создал', active: 'открыл', hold: 'закрепил', close: 'закрыл' };
 
   // eslint-disable-next-line capitalized-comments
   // prettier-ignore
@@ -164,7 +173,7 @@ function logEmbed(channel, member, action, field = false) {
 
   if (field) {
     embed
-      .addField('**Модератор**', `**${member}**`, true)
+      .addField(action !== 'create' ? '**Модератор**' : '**Пользователь**', `**${member}**`, true)
       .addField('**Тикет**', `**${channel} [${channel.name}]**`, true);
   } else {
     embed.setDescription(`**Модератор ${member} ${phrases[action]} тикет ${channel} [${channel.name}]**`);

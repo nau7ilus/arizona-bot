@@ -5,6 +5,7 @@ exports.supportSettings = {
   '772869388147490846': {
     moderators: ['772869388297961504', '772869388297961506'],
     channelID: '785621865834086500',
+    logChannelID: '786658872873975818',
     deleteAfter: 1000 * 60 * 60 * 24,
     cooldown: 5 * 60 * 1000,
     phrases: {
@@ -27,6 +28,7 @@ exports.supportSettings = {
   '470981734863994881': {
     moderators: ['583731951559639040', '769293532694970368', '741656419199090719'],
     channelID: '626219027907477527',
+    logChannelID: '615975866215956480',
     deleteAfter: 1000 * 60 * 60 * 24,
     cooldown: 5 * 60 * 1000,
     phrases: {
