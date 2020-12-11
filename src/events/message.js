@@ -6,16 +6,13 @@ module.exports = (client, message) => {
   if (message.type === 'PINS_ADD' && message.channel.id === process.env.REQUESTS_CHANNEL) {
     message.delete();
   }
-
-  if (
-    message.author.id === '159985870458322944' &&
-    message.channel.id === process.env.LEVELS_CHANNEL
-  ) {
+  if (message.author.id === '159985870458322944' && message.channel.id === process.env.LEVELS_CHANNEL) {
     require('../handlers/levels-handler').handleMessage(message);
     return;
   }
 
-  if (message.author.bot || message.system) return;
+  if (message.author.bot || message.system || !message.guild) return;
+  if (message.guild.id !== process.env.GUILD_ID) return;
 
   // Получаем префикс бота из базы данных. По умолчанию '/'
   if (!message.content.startsWith('/')) return;
@@ -31,9 +28,7 @@ module.exports = (client, message) => {
   const cmdName = args[0].toLowerCase().normalize();
   args.shift();
 
-  const cmd = client.commands.find(
-    c => c.name === cmdName || (c.aliases && c.aliases.includes(cmdName)) || null,
-  );
+  const cmd = client.commands.find(c => c.name === cmdName || (c.aliases && c.aliases.includes(cmdName)) || null);
 
   if (cmd) {
     // Если команда только для разработчиков, а у автора нет прав, дать ошибку
@@ -48,9 +43,7 @@ module.exports = (client, message) => {
         '[Message] %s попытался использовать команду для разработчиков %s %s',
         message.author.tag,
         cmd.name,
-        message.guild
-          ? `на сервере ${message.guild.name} в канале ${message.channel.name}`
-          : `в личных сообщениях`,
+        message.guild ? `на сервере ${message.guild.name} в канале ${message.channel.name}` : `в личных сообщениях`,
       );
       return;
     }
@@ -75,9 +68,8 @@ module.exports = (client, message) => {
       }
     } else {
       console.log(
-        `[Message] ${message.author.tag} использовал команду ${cmd.name} ${message.guild
-          ? `на сервере ${message.guild.name} в канале ${message.channel.name}`
-          : `в личных сообщениях`
+        `[Message] ${message.author.tag} использовал команду ${cmd.name} ${
+          message.guild ? `на сервере ${message.guild.name} в канале ${message.channel.name}` : `в личных сообщениях`
         }`,
       );
 

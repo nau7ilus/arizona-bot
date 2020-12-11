@@ -4,7 +4,7 @@ const { MessageEmbed } = require('discord.js');
 const { levelsConfig } = require('../utils/config');
 
 const sendMessage = (member, message, color = '#66ffad') => {
-  if (!levelsConfig[message.guild.id]) return;
+  if (!levelsConfig[member.guild.id]) return;
 
   const embed = new MessageEmbed()
     .setColor(color)
@@ -59,14 +59,14 @@ const giveLevelRole = async (member, level = 1, sendMsg = false) => {
   if (sendMsg) {
     sendMessage(
       member,
-      `Поздравляем, вы получили ${level} уровень!\n` + `За общение в чате ты получаешь роль \`${role.name}\``,
+      `Поздравляем, вы получили ${level} уровень!\nЗа общение в чате ты получаешь роль \`${role.name}\``,
       role.color,
     );
   }
 };
 
 const handleMessage = async message => {
-  if (!levelsConfig[member.guild.id]) return;
+  if (!levelsConfig[message.guild.id]) return;
 
   const member = message.mentions.members.first();
   const level = +message.content.split('|')[1];
