@@ -192,7 +192,7 @@ exports.meetingConfig = {
     // Собрание (всех админов).
     {
       type: 1,
-      skipChannel: '505740815189147648',
+      skipChannel: '626447839916064811',
       color: 0xdfe969,
       channel: '505740815189147648',
       manageRoles: ['684402883403579416', '684401897678962747'],
