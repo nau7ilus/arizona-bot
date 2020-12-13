@@ -113,7 +113,7 @@ exports.createTicket = async (client, reaction, reactedUser, settings) => {
   }
 };
 
-exports.action = (message, member, action, settings) => {
+exports.action = (message, member, action, settings, reaction) => {
   // Check if ticket is valid
   if (
     message.channel.name.startsWith('ticket-') &&
@@ -195,9 +195,9 @@ exports.handleReactions = (client, reaction, reactedUser) => {
   const isSupport = message.channel.id === settings.channelID;
 
   if (reaction.emoji.name === '✏️' && isSupport) exports.createTicket(client, reaction, reactedUser, settings);
-  else if (reaction.emoji.name === '🔒') exports.action(message, member, 'close', settings);
-  else if (reaction.emoji.name === '📌') exports.action(message, member, 'hold', settings);
-  else if (reaction.emoji.name === '📬') exports.action(message, member, 'active', settings);
+  else if (reaction.emoji.name === '🔒') exports.action(message, member, 'close', settings, reaction);
+  else if (reaction.emoji.name === '📌') exports.action(message, member, 'hold', settings, reaction);
+  else if (reaction.emoji.name === '📬') exports.action(message, member, 'active', settings, reaction);
 };
 
 exports.watchTickets = client => {
