@@ -114,11 +114,6 @@ exports.createTicket = async (client, reaction, reactedUser, settings) => {
 };
 
 exports.action = (message, member, action, settings) => {
-  // Check user perms
-  if (!member.hasPermission('ADMINISTRATOR') && !member.roles.cache.some(r => settings.moderators.includes(r.id))) {
-    return sendError(message.channel, member, 'у вас нет прав на использование этой команды', 3000);
-  }
-
   // Check if ticket is valid
   if (
     message.channel.name.startsWith('ticket-') &&
@@ -128,6 +123,11 @@ exports.action = (message, member, action, settings) => {
   }
   
   reaction.users.remove(member.user);
+  
+  // Check user perms
+  if (!member.hasPermission('ADMINISTRATOR') && !member.roles.cache.some(r => settings.moderators.includes(r.id))) {
+    return sendError(message.channel, member, 'у вас нет прав на использование этой команды', 3000);
+  }
 
   const phrases = { active: 'открыт', hold: 'закреплен', close: 'закрыт' };
 
