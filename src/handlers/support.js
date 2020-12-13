@@ -44,6 +44,8 @@ exports.checkMainMessage = client => {
 exports.createTicket = async (client, reaction, reactedUser, settings) => {
   const { message } = reaction;
 
+  reaction.users.remove(reactedUser);
+  
   if (client.cooldown.support.has(reactedUser.id)) {
     return sendError(message.channel, reactedUser, 'Вы не можете в данный момент создавать тикеты');
   }
@@ -124,6 +126,8 @@ exports.action = (message, member, action, settings) => {
   ) {
     return true;
   }
+  
+  reaction.users.remove(member.user);
 
   const phrases = { active: 'открыт', hold: 'закреплен', close: 'закрыт' };
 
@@ -194,8 +198,6 @@ exports.handleReactions = (client, reaction, reactedUser) => {
   else if (reaction.emoji.name === '🔒') exports.action(message, member, 'close', settings);
   else if (reaction.emoji.name === '📌') exports.action(message, member, 'hold', settings);
   else if (reaction.emoji.name === '📬') exports.action(message, member, 'active', settings);
-
-  reaction.users.remove(reactedUser);
 };
 
 exports.watchTickets = client => {
