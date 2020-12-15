@@ -607,3 +607,16 @@ exports.meetingConfig = {
     },
   ],
 };
+
+exports.familyConfig = {
+  // Red-Rock
+  '470981734863994881': {
+    categoryID: '505742782707793920',
+    baseRoleID: '606807761967251456',
+  },
+  // TEST
+  '787224090171670539': {
+    categoryID: '788109236252311662',
+    baseRoleID: '788115379473219656',
+  },
+};
