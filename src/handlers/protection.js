@@ -57,11 +57,11 @@ exports.handleMemberUpdate = async (client, oldMember, newMember) => {
           ${newRolesString.join(' ')}
           Пользователю ${newMember}**`,
         )
-        .addField('Снятые роли', oldRolesID.join('\n'))
+        .addField('Снятые роли:', oldRolesID.join('\n'))
         .setFooter(executor.id)
         .setTimestamp();
 
-      const msg = await channel.send(`<@&${settings.notifyRoles.join('> <&@')}>`, embed);
+      const msg = await channel.send(`<@&${settings.notifyRoles.join('> <@&')}>`, embed);
 
       await msg.react('👍');
       await msg.pin();
