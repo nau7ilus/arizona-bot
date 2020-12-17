@@ -5,4 +5,5 @@ module.exports = async (client, reaction, reactedUser) => {
   if (reactedUser.bot) return;
 
   require('../handlers/support').handleReactions(client, reaction, reactedUser);
+  require('../handlers/family').handleReactions(client, reaction, reactedUser);
 };
