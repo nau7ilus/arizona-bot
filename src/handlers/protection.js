@@ -61,7 +61,7 @@ exports.handleMemberUpdate = async (client, oldMember, newMember) => {
         .setFooter(executor.id)
         .setTimestamp();
 
-      const msg = await channel.send(`<@&${settings.notifyRoles.join('> <&')}>`, embed);
+      const msg = await channel.send(`<@&${settings.notifyRoles.join('> <&@')}>`, embed);
 
       await msg.react('👍');
       await msg.pin();
