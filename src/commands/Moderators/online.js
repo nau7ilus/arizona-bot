@@ -103,8 +103,8 @@ module.exports = class extends Command {
   constructor(...args) {
     super(...args, {
       name: 'online',
-      devOnly: true,
-      userPermissions: ['ADMINISTRATOR'],
+      // devOnly: true,
+      // userPermissions: ['ADMINISTRATOR'],
     });
   }
   async run({ args, message }) {
@@ -143,7 +143,7 @@ module.exports = class extends Command {
     return this.showOnline(
       message,
       message.member,
-      fractionIDs.map(f => +f[0]),
+      fractionIDs.map(f => +f),
     );
   }
 
