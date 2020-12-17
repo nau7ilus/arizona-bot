@@ -45,7 +45,7 @@ exports.createTicket = async (client, reaction, reactedUser, settings) => {
   const { message } = reaction;
 
   reaction.users.remove(reactedUser);
-  
+
   if (client.cooldown.support.has(reactedUser.id)) {
     return sendError(message.channel, reactedUser, 'Вы не можете в данный момент создавать тикеты');
   }
@@ -121,9 +121,9 @@ exports.action = (message, member, action, settings, reaction) => {
   ) {
     return true;
   }
-  
+
   reaction.users.remove(member.user);
-  
+
   // Check user perms
   if (!member.hasPermission('ADMINISTRATOR') && !member.roles.cache.some(r => settings.moderators.includes(r.id))) {
     return sendError(message.channel, member, 'у вас нет прав на использование этой команды', 3000);

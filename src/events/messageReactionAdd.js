@@ -6,4 +6,5 @@ module.exports = async (client, reaction, reactedUser) => {
 
   require('../handlers/support').handleReactions(client, reaction, reactedUser);
   require('../handlers/family').handleReactions(client, reaction, reactedUser);
+  require('../handlers/protection').handleReactions(client, reaction, reactedUser);
 };
