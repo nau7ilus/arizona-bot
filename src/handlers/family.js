@@ -14,6 +14,7 @@ exports.handleReactions = (client, reaction, reactedUser) => {
   if (message.author.id !== client.user.id) return;
 
   const invitedMember = message.mentions.members.first();
+  if (!invitedMember) return;
   // eslint-disable-next-line consistent-return
   if (member.id !== invitedMember.id) return reaction.users.remove(reactedUser);
 
