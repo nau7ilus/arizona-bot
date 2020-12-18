@@ -4,7 +4,7 @@ const { getFractionPlayers } = require('@nieopierzony/core');
 
 exports.getOnline = async (client, query, force = false, cache = true) => {
   const { serverID, fractionID } = query;
-  console.log(query);
+
   if (
     !force &&
     client.players[serverID] &&
