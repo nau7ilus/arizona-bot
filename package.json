@@ -9,7 +9,7 @@
   "scripts": {
     "start": "if-env NODE_ENV=production && npm run start:prod || npm run --silent start:dev",
     "mongo:prepare": "if not exist \"mongodb_tmp\" mkdir mongodb_tmp",
-    "mongo:start": "set PATH=%PATH%;\"C:/Program Files/MongoDB/Server/4.4/bin\" && npm run mongo:prepare && mongod --dbpath mongodb_tmp --logappend --logpath nul",
+    "mongo:start": "npm run mongo:prepare && \"D:/Program Files/MongoDB/Server/4.4/bin/mongod\" --dbpath mongodb_tmp --logappend --logpath nul",
     "start:prod": "cd backend && npm start",
     "start:dev": "concurrently --kill-others -n 'frontend,backend,mongo' -c 'blue,red,green' \"npm run frontend\" \"npm run backend\" \"npm run mongo:start\"",
     "frontend": "cd frontend && npm run checkDependencies && npm run serve",
