@@ -50,7 +50,7 @@ module.exports = class AdvancedClient extends Client {
   loadEvents() {
     console.log(`\n[Events] Начинается загрузка событий`);
 
-    const files = readdirSync('./src/events').filter(name => name.endsWith('.js'));
+    const files = readdirSync(`${__dirname}/../events`).filter(name => name.endsWith('.js'));
     let total = 0;
 
     files.forEach(file => {
