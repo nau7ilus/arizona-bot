@@ -103,10 +103,9 @@ module.exports = class extends Command {
   constructor(...args) {
     super(...args, {
       name: 'online',
-      // devOnly: true,
-      // userPermissions: ['ADMINISTRATOR'],
     });
   }
+  // eslint-disable-next-line require-await
   async run({ args, message }) {
     // Check settings for guild
     const settings = allSettings[message.guild.id];

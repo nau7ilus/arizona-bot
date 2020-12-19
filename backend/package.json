@@ -1,0 +1,24 @@
+{
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  },
+  "dependencies": {
+    "@nieopierzony/core": "1.0.4",
+    "axios": "^0.21.0",
+    "discord.js": "^12.4.1",
+    "dotenv": "^8.2.0",
+    "luxon": "^1.25.0",
+    "node-vk-bot-api": "^3.3.7",
+    "plural-ru": "^2.0.2",
+    "readdir": "^1.0.2"
+  },
+  "scripts": {
+    "dev": "nodemon ."
+  },
+  "name": "winslow-bot",
+  "version": "1.0.0",
+  "main": "./src/index.js",
+  "repository": "https://github.com/nieopierzony/winslow-bot.git",
+  "author": "Philipp <43653566+bumagaga@users.noreply.github.com>",
+  "license": "MIT"
+}
