@@ -10,7 +10,7 @@
     "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
     "start:prod": "cd backend && npm start",
     "start:dev": "concurrently --kill-others -n 'backend,frontend' -c 'red,blue' \"npm run backend\" \"npm run frontend\"",
-    "frontend": "cd frontend && npm start",
+    "frontend": "cd frontend && npm run serve",
     "backend": "cd backend && npm start"
   },
   "devDependencies": {
