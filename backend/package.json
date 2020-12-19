@@ -13,7 +13,9 @@
     "readdir": "^1.0.2"
   },
   "scripts": {
-    "dev": "nodemon ."
+    "start": "node .",
+    "dev": "nodemon -q .",
+    "checkDependencies": "if not exist \"node_modules\" npm i"
   },
   "name": "winslow-bot",
   "version": "1.0.0",
