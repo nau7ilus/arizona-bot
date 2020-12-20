@@ -116,8 +116,8 @@ exports.createTicket = async (client, reaction, reactedUser, settings) => {
 exports.action = (message, member, action, settings, reaction) => {
   // Check if ticket is valid
   if (
-    message.channel.name.startsWith('ticket-') &&
-    Object.keys(settings.categories).includes(message.channel.parentID)
+    !message.channel.name.startsWith('ticket-') ||
+    !Object.values(settings.categories).includes(message.channel.parentID)
   ) {
     return true;
   }
