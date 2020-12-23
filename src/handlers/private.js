@@ -76,6 +76,7 @@ module.exports.handleVoiceStateUpdate = async (client, oldState, newState) => {
         type: 'voice',
         parent: category,
         permissionOverwrites: [
+          ...category.permissionOverwrites.toJSON(),
           {
             id: newState.member.id,
             allow: ['CONNECT', 'SPEAK', 'USE_VAD', 'MANAGE_CHANNELS'],
