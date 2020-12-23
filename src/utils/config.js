@@ -771,6 +771,7 @@ exports.protectionConfig = {
 };
 
 exports.privateConfig = {
+  // TEST
   '787224090171670539': {
     category: '789861530707034164',
     channel: '789861601124810822',
@@ -781,5 +782,11 @@ exports.privateConfig = {
       usercooldown: 5 * 60 * 1000,
       guildcooldown: 1 * 10 * 1000,
     },
+  },
+};
+
+exports.rulesConfig = {
+  '787224090171670539': {
+    channel: '791200639563595786',
   },
 };
