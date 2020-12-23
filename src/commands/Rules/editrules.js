@@ -58,7 +58,7 @@ module.exports = class extends Command {
       value: '```',
     };
     contentText.split('\n').forEach(elem => {
-      if (fields[current].value.length > 1000) {
+      if (fields[current].value.length + elem.length > 1000) {
         current++;
         fields[current] = {
           value: '```',
