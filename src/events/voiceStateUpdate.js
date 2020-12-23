@@ -26,4 +26,6 @@ module.exports = async (client, oldState, newState) => {
       );
     }
   }
+
+  require('../handlers/private').handleVoiceStateUpdate(client, oldState, newState);
 };
