@@ -18,6 +18,17 @@ module.exports.handleVoiceStateUpdate = async (client, oldState, newState) => {
   const channel = guild.channels.cache.get(settings.channel);
   if (!channel) return;
 
+  // Если пользователь отключился
+  if (oldState.channel) {
+    if (oldState.channel.id === channel.id) return;
+
+    if (!oldState.channel.parent || oldState.channel.parent.id !== category.id) return;
+
+    if (oldState.channel.members.every(m => m.user.bot)) {
+      oldState.channel.delete();
+    }
+  }
+
   // Если пользователь подключился
   if (newState.channel) {
     if (newState.channel.id === channel.id) {
@@ -79,17 +90,6 @@ module.exports.handleVoiceStateUpdate = async (client, oldState, newState) => {
       await newState.setChannel(ch);
     }
   }
-
-  // Если пользователь отключился
-  if (oldState.channel) {
-    if (oldState.channel.id === channel.id) return;
-
-    if (!oldState.channel.parent || oldState.channel.parent.id !== category.id) return;
-
-    if (oldState.channel.members.every(m => m.user.bot)) {
-      oldState.channel.delete();
-    }
-  }
 };
 
 // eslint-disable-next-line require-await
@@ -124,12 +124,12 @@ function sendErrorMessage(member, settings) {
     .setTimestamp();
   member.user
     .send(embed)
-    .then(msg => msg.delete({ timeout: 5000 }))
+    .then(msg => msg.delete({ timeout: 10000 }))
     .catch(() => {
       member.guild.channels.cache
         .get(settings.notifyChannel)
         .send(member, embed)
-        .then(msg => msg.delete({ timeout: 5000 }));
+        .then(msg => msg.delete({ timeout: 10000 }));
     });
 
   errormsgcd.add(member.id);
