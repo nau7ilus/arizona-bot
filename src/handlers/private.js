@@ -20,11 +20,12 @@ module.exports.handleVoiceStateUpdate = async (client, oldState, newState) => {
 
   // Если пользователь отключился
   if (oldState.channel) {
-    if (oldState.channel.id === channel.id) return;
-
-    if (!oldState.channel.parent || oldState.channel.parent.id !== category.id) return;
-
-    if (oldState.channel.members.every(m => m.user.bot)) {
+    if (
+      oldState.channel.id !== channel.id &&
+      oldState.channel.parent &&
+      oldState.channel.parent.id === category.id &&
+      oldState.channel.members.every(m => m.user.bot)
+    ) {
       oldState.channel.delete();
     }
   }
@@ -80,10 +81,6 @@ module.exports.handleVoiceStateUpdate = async (client, oldState, newState) => {
           {
             id: newState.member.id,
             allow: ['CONNECT', 'SPEAK', 'USE_VAD', 'MANAGE_CHANNELS'],
-          },
-          {
-            id: settings.moderator,
-            allow: ['MUTE_MEMBERS', 'MOVE_MEMBERS'],
           },
         ],
       });
