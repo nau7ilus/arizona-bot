@@ -128,8 +128,8 @@ module.exports = class extends Command {
 
 function getAttachmentContent(attachment) {
   return new Promise((resolve, reject) => {
-    const file = fs.createWriteStream(path, { flags: 'wx' });
     const path = `tmp_${attachment.id}.txt`;
+    const file = fs.createWriteStream(path, { flags: 'wx' });
 
     const request = https.get(attachment.url, response => {
       if (response.statusCode === 200) {
