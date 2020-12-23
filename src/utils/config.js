@@ -771,15 +771,26 @@ exports.protectionConfig = {
 };
 
 exports.privateConfig = {
-  // TEST
-  '787224090171670539': {
-    category: '789861530707034164',
-    channel: '789861601124810822',
-    notifyChannel: '787224090766475276',
+  // Red-Rock
+  '470981734863994881': {
+    category: '770701655195779092',
+    channel: '770701656211062815',
+    notifyChannel: '637843341496680448',
     limits: {
       privates: 10,
-      usercooldown: 10 * 1000,
-      guildcooldown: 1 * 3 * 1000,
+      usercooldown: 3 * 60 * 1000,
+      guildcooldown: 1 * 5 * 1000,
+    },
+  },
+  // Winslow
+  '772869388147490846': {
+    category: '773667755794366465',
+    channel: '773667756423249962',
+    notifyChannel: '772869390312013836',
+    limits: {
+      privates: 10,
+      usercooldown: 3 * 60 * 1000,
+      guildcooldown: 1 * 5 * 1000,
     },
   },
 };
