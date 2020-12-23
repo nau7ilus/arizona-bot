@@ -776,11 +776,10 @@ exports.privateConfig = {
     category: '789861530707034164',
     channel: '789861601124810822',
     notifyChannel: '787224090766475276',
-    moderator: '788319651242835968',
     limits: {
-      privates: 5,
-      usercooldown: 5 * 60 * 1000,
-      guildcooldown: 1 * 10 * 1000,
+      privates: 10,
+      usercooldown: 10 * 1000,
+      guildcooldown: 1 * 3 * 1000,
     },
   },
 };
