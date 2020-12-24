@@ -2,6 +2,8 @@
 
 require('dotenv').config();
 
+const mongoose = require('mongoose');
+
 const Client = require('./structures/Client');
 
 const client = new Client({
@@ -11,6 +13,20 @@ const client = new Client({
   messageSweepInterval: 120,
   fetchAllMembers: true,
 });
+
+mongoose.connect(
+  process.env.DATABASE_URL,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+  },
+  err => {
+    if (err) throw err;
+    console.log('[Database] База данных Mongo успешно подключена.');
+  },
+);
 
 client.login();
 client.loadEvents();
