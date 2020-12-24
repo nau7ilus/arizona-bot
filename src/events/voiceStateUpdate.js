@@ -5,7 +5,7 @@ module.exports = async (client, oldState, newState) => {
 
   if (newState.channel) {
     const roleByChannel = newState.guild.roles.cache.find(r => r.name === newState.channel.name);
-    if (roleByChannel) {
+    if (roleByChannel && !newState.channel.permissionsFor(newState.member).has('CONNECT')) {
       await newState.member.roles.add(roleByChannel);
       console.log(
         `[LOG] Пользователю "%s" выдана роль "%s" по причине захода в этот канал`,
@@ -26,4 +26,6 @@ module.exports = async (client, oldState, newState) => {
       );
     }
   }
+
+  require('../handlers/private').handleVoiceStateUpdate(client, oldState, newState);
 };
