@@ -1,17 +1,25 @@
 {
-  "devDependencies": {
-    "eslint": "^7.12.1",
-    "eslint-config-prettier": "^6.15.0",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-prettier": "^3.1.4",
-    "nodemon": "^2.0.6",
-    "prettier": "^2.1.2"
+  "name": "winslow-bot",
+  "version": "1.0.0",
+  "main": "./src/index.js",
+  "repository": "https://github.com/nieopierzony/winslow-bot.git",
+  "author": "Philipp <43653566+bumagaga@users.noreply.github.com>",
+  "license": "MIT",
+  "comment": "Before running, make sure you have downloaded Mongo Server https://www.mongodb.com/try/download/community",
+  "scripts": {
+    "start": "if-env NODE_ENV=production && yarn start:prod || yarn run --silent start:dev",
+    "mongo:prepare": "if not exist \"mongodb_tmp\" mkdir mongodb_tmp",
+    "mongo:start": "yarn mongo:prepare && \"D:/Program Files/MongoDB/Server/4.4/bin/mongod\" --dbpath mongodb_tmp --logappend --logpath nul",
+    "start:dev": "concurrently --kill-others -n 'bot,mongo' -c 'grenn,blue' \"yarn dev\" \"yarn mongo:start\"",
+    "dev": "set DATABASE_URL=mongodb://localhost:27017/winslow-bot&& nodemon .",
+    "start:prod": "node ."
   },
   "dependencies": {
     "@nieopierzony/core": "1.0.4",
     "axios": "^0.21.0",
     "discord.js": "^12.4.1",
     "dotenv": "^8.2.0",
+    "if-env": "^1.0.4",
     "luxon": "^1.25.0",
     "mongoose": "^5.11.8",
     "mongoose-auto-increment": "^5.0.1",
@@ -19,13 +27,13 @@
     "plural-ru": "^2.0.2",
     "readdir": "^1.0.2"
   },
-  "scripts": {
-    "dev": "nodemon ."
-  },
-  "name": "winslow-bot",
-  "version": "1.0.0",
-  "main": "./src/index.js",
-  "repository": "https://github.com/nieopierzony/winslow-bot.git",
-  "author": "Philipp <43653566+bumagaga@users.noreply.github.com>",
-  "license": "MIT"
+  "devDependencies": {
+    "concurrently": "^5.3.0",
+    "eslint": "^7.12.1",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "nodemon": "^2.0.6",
+    "prettier": "^2.1.2"
+  }
 }

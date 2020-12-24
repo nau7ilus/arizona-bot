@@ -105,3 +105,6 @@ dist
 
 # VS Code settings
 .vscode/
+
+# Dev MongoDB Files
+mongodb_tmp/
