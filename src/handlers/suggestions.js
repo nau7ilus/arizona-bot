@@ -45,7 +45,7 @@ exports.action = async (message, action) => {
 
   if (
     !message.member.hasPermission('ADMINISTRATOR') &&
-    message.member.roles.cache.some(r => !settings.moderators.includes(r.id))
+    !message.member.roles.cache.some(r => settings.moderators.includes(r.id))
   ) {
     return message.channel.send(
       message.member,
