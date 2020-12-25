@@ -3,6 +3,7 @@
 require('dotenv').config();
 
 const mongoose = require('mongoose');
+const autoIncrement = require('mongoose-auto-increment');
 
 const Client = require('./structures/Client');
 
@@ -27,6 +28,7 @@ mongoose.connect(
     console.log('[Database] База данных Mongo успешно подключена.');
   },
 );
+autoIncrement.initialize(mongoose.connection);
 
 client.login();
 client.loadEvents();
