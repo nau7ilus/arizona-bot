@@ -10,6 +10,7 @@ module.exports = (client, message) => {
   if (message.author.bot || message.system || !message.guild) return;
 
   require('../handlers/levels-handler').handleMessage(message);
+  require('../handlers/suggestions').handleMessage(message);
 
   // Получаем префикс бота из базы данных. По умолчанию '/'
   if (!message.content.startsWith('/')) return;

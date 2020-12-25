@@ -1,5 +1,14 @@
 'use strict';
 
+exports.suggestions = {
+  // Winslow
+  '772869388147490846': {
+    channelID: '791763975108952064',
+    approvedChannelID: '791820269890043935',
+    moderators: ['772869388297961503'],
+  },
+};
+
 exports.supportSettings = {
   // Winslow
   '772869388147490846': {
