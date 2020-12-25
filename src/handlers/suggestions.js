@@ -104,7 +104,7 @@ exports.action = async (message, action) => {
 
   suggestionMsg.edit(embed);
 
-  if (message.channelID.id !== settings.channelID) {
+  if (message.channel.id !== settings.channelID) {
     message.delete();
     message.channel.send(embed).then(msg => {
       msg.delete({ timeout: 5000 });
