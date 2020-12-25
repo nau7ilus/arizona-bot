@@ -122,7 +122,7 @@ exports.action = async (message, action) => {
   const suggestionAuthor = message.client.users.cache.get(suggestion.authorID);
   if (suggestionAuthor) {
     suggestionAuthor.send(
-      `Привет! Твое предложение **#${suggestionID}** на сервере **${message.guild.name}**` +
+      `Привет! Твое предложение **#${suggestionID}** на сервере **${message.guild.name}** ` +
         `было ${config[action].description} модератором **${message.author.tag}**`,
       embed,
     );
