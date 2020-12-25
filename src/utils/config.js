@@ -127,6 +127,7 @@ exports.onlineSettings = {
 exports.levelsConfig = {
   // Winslow
   '772869388147490846': {
+    channelID: '772964178284773406',
     rolesByLevel: [
       { level: 1, roleID: '772869388155486253' },
       { level: 10, roleID: '772869388155486254' },
@@ -151,6 +152,7 @@ exports.levelsConfig = {
 
   // Red-Rock
   '470981734863994881': {
+    channelID: '615974467935666226',
     rolesByLevel: [
       { level: 1, roleID: '611009357433536515' },
       { level: 10, roleID: '611009353859858443' },

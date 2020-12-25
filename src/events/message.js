@@ -6,12 +6,10 @@ module.exports = (client, message) => {
   if (message.type === 'PINS_ADD' && message.channel.id === process.env.REQUESTS_CHANNEL) {
     message.delete();
   }
-  if (message.author.id === '159985870458322944' && message.channel.id === process.env.LEVELS_CHANNEL) {
-    require('../handlers/levels-handler').handleMessage(message);
-    return;
-  }
 
   if (message.author.bot || message.system || !message.guild) return;
+
+  require('../handlers/levels-handler').handleMessage(message);
 
   // Получаем префикс бота из базы данных. По умолчанию '/'
   if (!message.content.startsWith('/')) return;

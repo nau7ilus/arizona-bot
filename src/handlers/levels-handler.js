@@ -66,7 +66,11 @@ const giveLevelRole = async (member, level = 1, sendMsg = false) => {
 };
 
 const handleMessage = async message => {
+  if (message.author.id !== '159985870458322944') return;
+
   if (!levelsConfig[message.guild.id]) return;
+
+  if (message.channel.id !== levelsConfig.channelID) return;
 
   const member = message.mentions.members.first();
   const level = +message.content.split('|')[1];
