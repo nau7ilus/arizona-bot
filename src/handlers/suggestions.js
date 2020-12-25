@@ -5,10 +5,15 @@ const { MessageEmbed } = require('discord.js');
 const Suggestion = require('../models/Suggestion');
 const suggestionsConfig = require('../utils/config').suggestions;
 
+exports.isModer = (member, settings) =>
+  member.hasPermission('ADMINISTRATOR') || member.roles.cache.some(r => settings.moderators.includes(r.id));
+
 exports.handleMessage = async message => {
   const settings = suggestionsConfig[message.guild.id];
   // eslint-disable-next-line no-useless-return
   if (!settings || message.channel.id !== settings.channelID) return;
+
+  if (exports.isModer(message.member, settings) && message.content.startsWith('/')) return;
 
   const suggestionDoc = await Suggestion.create({
     guildID: message.guild.id,
@@ -43,10 +48,7 @@ exports.action = async (message, action) => {
   const settings = suggestionsConfig[message.guild.id];
   if (!settings) return;
 
-  if (
-    !message.member.hasPermission('ADMINISTRATOR') &&
-    !message.member.roles.cache.some(r => settings.moderators.includes(r.id))
-  ) {
+  if (!exports.isModer(message.member, settings)) {
     return message.channel.send(
       message.member,
       new MessageEmbed().setColor('RED').setTitle('У вас нет прав на использование данной команды'),
@@ -101,10 +103,14 @@ exports.action = async (message, action) => {
   embed.fields[0] = { name: `Причина от ${message.author.tag}`, value: reason || 'Причина не указана', inline: false };
 
   suggestionMsg.edit(embed);
-  message.channel.send(embed).then(msg => {
-    msg.delete({ timeout: 5000 });
-    message.react('👍');
-  });
+
+  if (message.channelID.id !== settings.channelID) {
+    message.delete();
+    message.channel.send(embed).then(msg => {
+      msg.delete({ timeout: 5000 });
+      message.react('👍');
+    });
+  }
 
   const approvedChannel = message.guild.channels.cache.get(settings.approvedChannelID);
   if (approvedChannel && ['approve', 'implement', 'consider'].includes(action)) {
