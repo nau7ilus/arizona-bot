@@ -110,6 +110,8 @@ exports.action = async (message, action) => {
       msg.delete({ timeout: 5000 });
       message.react('👍');
     });
+  } else {
+    message.delete();
   }
 
   const approvedChannel = message.guild.channels.cache.get(settings.approvedChannelID);
