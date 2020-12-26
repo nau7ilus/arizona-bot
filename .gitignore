@@ -108,3 +108,6 @@ dist
 
 # Dev MongoDB Files
 mongodb_tmp/
+
+# Idea files
+.idea/
