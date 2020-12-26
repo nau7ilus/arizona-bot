@@ -85,7 +85,7 @@ exports.supportSettings = {
     moderators: ['695387225642238014'],
     channelID: '792392312982077501',
     logChannelID: '792392408167874611',
-    deleteAfter: 1000 * 60 * 60 * 24,
+    deleteAfter: 1000 * 60 * 60 * 5,
     cooldown: 5 * 60 * 1000,
     phrases: {
       mainMessage:
