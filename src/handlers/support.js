@@ -113,7 +113,7 @@ exports.createTicket = async (client, reaction, reactedUser, settings) => {
   }
 };
 
-exports.action = (message, member, action, settings, reaction) => {
+exports.action = (message, member, action, settings) => {
   // Check if ticket is valid
   if (
     !message.channel.name.startsWith('ticket-') ||
@@ -121,8 +121,6 @@ exports.action = (message, member, action, settings, reaction) => {
   ) {
     return true;
   }
-
-  reaction.users.remove(member.user);
 
   // Check user perms
   if (!member.hasPermission('ADMINISTRATOR') && !member.roles.cache.some(r => settings.moderators.includes(r.id))) {
@@ -193,6 +191,10 @@ exports.handleReactions = (client, reaction, reactedUser) => {
   const { message } = reaction;
   const member = message.guild.member(reactedUser);
   const isSupport = message.channel.id === settings.channelID;
+
+  if ((reaction.emoji.name === '✏️' && !isSupport) || ['🔒', '📌', '📬'].includes(reaction.emoji.name)) {
+    reaction.users.remove(member.user);
+  }
 
   if (reaction.emoji.name === '✏️' && isSupport) exports.createTicket(client, reaction, reactedUser, settings);
   else if (reaction.emoji.name === '🔒') exports.action(message, member, 'close', settings, reaction);
