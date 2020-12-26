@@ -11,6 +11,7 @@ module.exports = (client, message) => {
 
   require('../handlers/levels-handler').handleMessage(message);
   require('../handlers/suggestions').handleMessage(message);
+  require('../handlers/roles').handleMessage(message);
 
   // Получаем префикс бота из базы данных. По умолчанию '/'
   if (!message.content.startsWith('/')) return;
