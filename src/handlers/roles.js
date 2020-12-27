@@ -28,7 +28,7 @@ exports.handleMessage = message => {
   }
 
   if (
-    !message.member.hasPermission('ADMINISTRATOR') &&
+    !message.member.hasPermission('ADMINISTRATOR') ||
     !message.member.roles.some(r => catSettings.manage.includes(r.id))
   ) {
     return message.reply('у вас нет доступа к данной категории');
