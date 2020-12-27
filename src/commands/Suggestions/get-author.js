@@ -2,6 +2,7 @@
 'use strict';
 
 const { MessageEmbed } = require('discord.js');
+const { isModer } = require('../../handlers/suggestions');
 const Suggestion = require('../../models/Suggestion');
 const Command = require('../../structures/Command');
 const suggestionsConfig = require('../../utils/config').suggestions;
@@ -17,10 +18,7 @@ module.exports = class extends Command {
     const settings = suggestionsConfig[message.guild.id];
     if (!settings) return;
 
-    if (
-      !message.member.hasPermission('ADMINISTRATOR') &&
-      message.member.roles.cache.some(r => !settings.moderators.includes(r.id))
-    ) {
+    if (!isModer(message.member, settings)) {
       return message.channel.send(
         message.member,
         new MessageEmbed().setColor('RED').setTitle('У вас нет прав на использование данной команды'),
