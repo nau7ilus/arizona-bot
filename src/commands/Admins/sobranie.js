@@ -4,7 +4,7 @@
 const { MessageEmbed } = require('discord.js');
 const plural = require('plural-ru');
 const Command = require('../../structures/Command');
-const allMeetingConfig = require('../../utils/config').meetingConfig;
+const allMeetingConfig = require('../../utils/config').sobranieConfig;
 
 const PEOPLE = key => plural(key, `%d человек`, `%d человека`, `%d человек`);
 
