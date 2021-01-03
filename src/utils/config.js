@@ -191,7 +191,7 @@ exports.familyConfig = {
   },
 };
 
-exports.meetingConfig = {
+exports.sobranieConfig = {
   // Red-Rock
   '470981734863994881': [
     // Лекция (хелперы).
