@@ -184,7 +184,7 @@ module.exports = class extends Command {
       );
     }
 
-    message.channel.send(mentionMember, ...embeds);
+    message.channel.send(mentionMember, ...embeds).then(msg => msg.delete({ timeout: 10000 }));
   }
 
   async awaitFractions(message, fractionIDs) {
