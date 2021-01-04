@@ -1326,3 +1326,18 @@ exports.onlineSettings = {
     },
   },
 };
+
+exports.rolebyreactionConfig = {
+  // Winslow
+  '772869388147490846': {
+    channel: '',
+    emoji: '🎄',
+    role: '',
+    embed: {
+      title: '',
+      description: '',
+      color: 0,
+      footer: '',
+    },
+  },
+};
