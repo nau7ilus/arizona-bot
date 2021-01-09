@@ -1378,3 +1378,10 @@ exports.rolebyreactionConfig = {
     },
   },
 };
+
+exports.newsConfig = {
+  // Winslow
+  '772869388147490846': {
+    allowedRoles: ['797169502927454289'],
+  },
+};
