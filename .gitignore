@@ -111,3 +111,4 @@ mongodb_tmp/
 
 # Idea files
 .idea/
+test/
