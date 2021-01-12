@@ -102,11 +102,8 @@ module.exports = class extends Command {
       'info.txt',
       `
 [!!] Перед началом работы прочитать [!!]
-Данный файл содержит конфиденциальную информацию относящуюся к ${message.guild.name}.
-Если этот файл попал к вам по ошибке, закройте и удалите его.
-Уполномоченным на получение этого файла, следует относиться к нему с осторожностью.
 Информация в файле предоставляется "как есть" и она может быть неполной и/или неверной.
-Информация содержащаяся в этом файле, основана на административных данных Discord-сервера ${message.guild.name}
+Информация содержащаяся в этом файле, основана исключительно на данных Discord-сервера ${message.guild.name}
 Обо всех ошибках сообщайте администрации бота.
 [!!] Удачного пользования [!!]
 
@@ -121,6 +118,8 @@ ${nelegalInfo.join('\n')}
 
 
 [#] Информация о постановлении/повышении администрации
+[!] Статус администратора (поставлен/повышен/восстановлен) определяется косвенно, используя ненадежную информацию
+[!] Перед использованием информации следует её проверять.
 ${adminsUpInfo.join('\n')}
 
 
@@ -168,7 +167,6 @@ function getAdminsUpInfo(start, end, message, channel) {
         messages.forEach(element => {
           const a = [
             ...element.content.matchAll(
-              // eslint-disable-next-line max-len
               /1\..*?([a-zA-Z]+(?: |_)[a-zA-Z]+)\n2\..*?(\d+)\n3\..*?(\d{1,2}\.\d{1,2}.\d{2,4})/gm,
             ),
           ];
@@ -181,11 +179,11 @@ function getAdminsUpInfo(start, end, message, channel) {
             nick,
             lvl,
           };
-          if (map.has(message.author.id)) {
-            map.get(message.author.id).push(obj);
-            map.get(message.author.id).sort((foo, b) => b.date.getTime() - foo.date.getTime());
+          if (map.has(element.author.id)) {
+            map.get(element.author.id).push(obj);
+            map.get(element.author.id).sort((foo, b) => b.date.getTime() - foo.date.getTime());
           } else {
-            map.set(message.author.id, [obj]);
+            map.set(element.author.id, [obj]);
           }
         });
         map.forEach(value => {
