@@ -246,23 +246,25 @@ function getLeadersInfo(start, end, channel, isNelegal = false) {
       const result = [];
 
       messages.forEach(element => {
-        const [date, content] = isNelegal
-          ? [
-              element.content.split(/\] \|?/)[0],
-              element.content
-                .split(/\] \|?/)
-                .slice(1)
-                .join('] '),
-            ]
-          : element.content.split(' | ');
-        const [day, monthZ, year] = isNelegal ? date.slice(1).split('.') : date.split('.');
-        const month = +monthZ - 1;
-        if (
-          isInTime(new Date(year, month, day), start, end) &&
-          (content.toLowerCase().startsWith('поставлен') || content.toLowerCase().startsWith('снят'))
-        ) {
-          result.push(`${dateToString(new Date(year, month, day))} | ${content}`);
-        }
+        element.content.split('\n').forEach(messageContent => {
+          const [date, content] = isNelegal
+            ? [
+                messageContent.split(/\] \|?/)[0],
+                messageContent
+                  .split(/\] \|?/)
+                  .slice(1)
+                  .join('] '),
+              ]
+            : messageContent.split(' | ');
+          const [day, monthZ, year] = isNelegal ? date.slice(1).split('.') : date.split('.');
+          const month = +monthZ - 1;
+          if (
+            isInTime(new Date(year, month, day), start, end) &&
+            (content.toLowerCase().startsWith('поставлен') || content.toLowerCase().startsWith('снят'))
+          ) {
+            result.push(`${dateToString(new Date(year, month, day))} | ${content}`);
+          }
+        });
       });
       resolve(result);
     });
