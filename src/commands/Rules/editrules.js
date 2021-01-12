@@ -54,7 +54,7 @@ module.exports = class extends Command {
       content.first().attachments && content.first().attachments.size !== 0
         ? await getAttachmentContent(content.first().attachments.first())
         : content.first().content.trim();
-    
+
     await content.first().delete();
 
     const fields = [];
