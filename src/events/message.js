@@ -80,11 +80,11 @@ module.exports = async (client, message) => {
       return;
     }
 
-    const isValidArgs = await cmd.validate(args).catch(error => {
+    const parsedArgs = await cmd.validate(args).catch(error => {
       if (error instanceof MessageEmbed) message.reply(error);
       else throw error;
     });
-    if (!isValidArgs) return;
-    cmd.run({ client, message, args }).catch(warning => onRunError({ warning, client, message }));
+    if (!parsedArgs) return;
+    cmd.run({ client, message, args: parsedArgs }).catch(warning => onRunError({ warning, client, message }));
   }
 };

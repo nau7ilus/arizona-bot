@@ -1,6 +1,7 @@
 'use strict';
 
 const { DateTime } = require('luxon');
+const { watchMutes } = require('../handlers/moderators');
 const { watchPrivates } = require('../handlers/private');
 const { checkMainMessage, watchTickets } = require('../handlers/support');
 
@@ -18,6 +19,11 @@ module.exports = client => {
   checkMainMessage(client);
   watchTickets(client);
   watchPrivates(client);
+  watchMutes(client);
+
+  setInterval(() => {
+    watchMutes(client);
+  }, 60 * 1000);
 
   // Отправлять каждые 20 минут информацию об использованной памяти
   setInterval(() => {

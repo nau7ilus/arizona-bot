@@ -44,7 +44,7 @@ class Command extends AliasPiece {
     this.guildOnly = options.guildOnly;
     this.devOnly = options.devOnly;
     this.nsfw = options.nsfw;
-    this.arguments = options.arguments;
+    this.arguments = options.arguments || {};
   }
 
   run() {
@@ -54,7 +54,8 @@ class Command extends AliasPiece {
   validate(args) {
     return new Promise((resolve, reject) => {
       const requiredArguments = Object.entries(this.arguments);
-      if (args.length === 0 && requiredArguments.length === 0) reject(this.invalidArguments());
+      if (requiredArguments.length === 0) resolve(args);
+      if (args.length === 0) reject(this.invalidArguments());
 
       if (requiredArguments.some(arg => arg[0] === 'spaceString')) {
         if (requiredArguments[requiredArguments.lastIndex] !== 'spaceString') {
@@ -74,7 +75,7 @@ class Command extends AliasPiece {
         if (!args[i].match(regex)) reject(this.invalidArguments(i));
       }
 
-      resolve(true);
+      resolve(args);
     });
   }
 

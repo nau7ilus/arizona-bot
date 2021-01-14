@@ -2,6 +2,7 @@
 
 const { MessageEmbed } = require('discord.js');
 const { DateTime } = require('luxon');
+const { colors } = require('./constants');
 
 exports.random = array => array[Math.floor(Math.random() * array.length)];
 
@@ -13,7 +14,7 @@ exports.sendErrorMessage = ({ message, content, member, emoji, react = true, col
       messageType === 'plain_text'
         ? `**\`[${emoji} | Ошибка] \`${member}\`, ${content}\`**`
         : new MessageEmbed()
-            .setColor(color || '#ff3333')
+            .setColor(color || colors.ERROR)
             .setTitle(`**${emoji} | Произошла ошибка**`)
             .setDescription(`**${member}, ${content}**`)
             .setFooter('HamsterBot | Ошибка', message.client.user.displayAvatarURL()),
@@ -36,7 +37,7 @@ exports.onRunError = ({ client, warning, message }) => {
 
     return message.channel.send(
       new MessageEmbed()
-        .setColor('#ff3333')
+        .setColor(colors.ERROR)
         .setDescription(`**Произошла ошибка в коде системы**`)
         .addField(
           '**Отладка**',
@@ -52,7 +53,7 @@ exports.onRunError = ({ client, warning, message }) => {
   } else {
     return message.channel.send(
       new MessageEmbed()
-        .setColor('#ff3333')
+        .setColor(colors.ERROR)
         .setTitle('**🚫 | Ошибка**')
         .setDescription('**Произошла ошибка в коде команды. Сообщите разработчикам об этом**'),
     );
@@ -117,7 +118,7 @@ exports.missingPermsError = ({ message, channel, missingPerms, emoji = '🔇', r
       .send(
         !missingPerms.includes('EMBED_LINKS') || canIgnore
           ? new MessageEmbed()
-              .setColor('#ff3333')
+              .setColor(colors.ERROR)
               .setTitle(`**${emoji} | Произошла ошибка**`)
               .setDescription(
                 `**У ${isClient ? 'бота' : 'вас'} нехватает прав \`
@@ -130,3 +131,7 @@ exports.missingPermsError = ({ message, channel, missingPerms, emoji = '🔇', r
       .then(msg => setTimeout(() => msg.delete(), 25 * 1000));
   }
 };
+
+exports.resolveDuration = durationString =>
+  parseInt(durationString.slice(0, -1)) *
+  { s: 1000, m: 1000 * 60, h: 1000 * 60 * 60, d: 1000 * 60 * 60 * 24 }[durationString[durationString.length - 1]];
