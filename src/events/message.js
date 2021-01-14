@@ -1,9 +1,10 @@
 /* eslint-disable consistent-return */
 'use strict';
 
+const { MessageEmbed } = require('discord.js');
 const { onRunError, sendErrorMessage, checkPermissions, missingPermsError } = require('../utils');
 
-module.exports = (client, message) => {
+module.exports = async (client, message) => {
   if (message.type === 'PINS_ADD' && message.channel.id === process.env.REQUESTS_CHANNEL) {
     message.delete();
   }
@@ -79,9 +80,11 @@ module.exports = (client, message) => {
       return;
     }
 
-    if (!cmd.validate()) {
-      return message.reply(':((');
-    }
+    const isValidArgs = await cmd.validate(args).catch(error => {
+      if (error instanceof MessageEmbed) message.reply(error);
+      else throw error;
+    });
+    if (!isValidArgs) return;
     cmd.run({ client, message, args }).catch(warning => onRunError({ warning, client, message }));
   }
 };
