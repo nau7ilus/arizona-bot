@@ -9,7 +9,7 @@
   "scripts": {
     "start": "if-env NODE_ENV=production && yarn start:prod || yarn run --silent start:dev",
     "mongo:prepare": "if not exist \"mongodb_tmp\" mkdir mongodb_tmp",
-    "mongo:start": "yarn mongo:prepare && \"D:/Program Files/MongoDB/Server/4.4/bin/mongod\" --dbpath mongodb_tmp --logappend --logpath nul",
+    "mongo:start": "yarn mongo:prepare && \"C:/Program Files/MongoDB/Server/4.4/bin/mongod\" --dbpath mongodb_tmp --logappend --logpath nul",
     "start:dev": "concurrently --kill-others -n 'bot,mongo' -c 'grenn,blue' \"yarn dev\" \"yarn mongo:start\"",
     "dev": "set DATABASE_URL=mongodb://localhost:27017/winslow-bot&& nodemon .",
     "start:prod": "node ."
@@ -19,7 +19,11 @@
     "axios": "^0.21.1",
     "discord.js": "^12.4.1",
     "dotenv": "^8.2.0",
+    "fastify": "^3.9.2",
+    "fastify-cors": "^5.1.0",
+    "form-data": "^3.0.0",
     "if-env": "^1.0.4",
+    "jsonwebtoken": "^8.5.1",
     "luxon": "^1.25.0",
     "mongoose": "^5.11.8",
     "mongoose-auto-increment": "^5.0.1",
