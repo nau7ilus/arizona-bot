@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 'use strict';
 
 const { onRunError, sendErrorMessage, checkPermissions, missingPermsError } = require('../utils');
@@ -28,7 +29,6 @@ module.exports = (client, message) => {
   args.shift();
 
   const cmd = client.commands.find(c => c.name === cmdName || (c.aliases && c.aliases.includes(cmdName)) || null);
-
   if (cmd) {
     // Если команда только для разработчиков, а у автора нет прав, дать ошибку
     if (!client.isDev(message.author.id) && (['dev'].includes(cmd.category) || cmd.devOnly)) {
@@ -79,6 +79,9 @@ module.exports = (client, message) => {
       return;
     }
 
+    if (!cmd.validate()) {
+      return message.reply(':((');
+    }
     cmd.run({ client, message, args }).catch(warning => onRunError({ warning, client, message }));
   }
 };
