@@ -63,7 +63,7 @@ exports.suggestions = {
   // Red-Rock
   '470981734863994881': {
     channelID: '767516424154644512',
-    approvedChannelID: '791993146341982208',
+    approvedChannelID: '804965718167781426',
     moderators: ['507859701472690197'],
   },
   // Village
