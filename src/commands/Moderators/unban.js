@@ -19,6 +19,7 @@ module.exports = class extends Command {
       },
     });
   }
+  // eslint-disable-next-line require-await
   async run({ args, message }) {
     const guild = message.guild;
 
