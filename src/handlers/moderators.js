@@ -4,7 +4,7 @@ const { MessageEmbed } = require('discord.js');
 const Punishment = require('../models/Punishment');
 const { moderationConfig } = require('../utils/config');
 
-exports.watchMutes = client => {
+exports.watchPunishments = client => {
   Object.entries(moderationConfig).forEach(async guildSettings => {
     const [guildID, settings] = guildSettings;
     if (!settings || !guildID) return;
@@ -12,27 +12,30 @@ exports.watchMutes = client => {
     const guild = client.guilds.cache.get(guildID);
     if (!guild) return;
 
-    const mutes = await Punishment.find({
+    const punishments = await Punishment.find({
       guildID: guildID,
-      type: 0,
       validUntil: { $lte: Date.now() },
     }).exec();
 
-    mutes.forEach(mute => {
-      const member = guild.member(mute.userID);
-      if (!member) return;
+    punishments.forEach(punishment => {
+      if (punishment.type === 0) {
+        const member = guild.member(punishment.userID);
+        if (!member) return;
 
-      Punishment.findByIdAndRemove(mute.id).exec();
+        Punishment.findByIdAndRemove(punishment.id).exec();
 
-      member.roles.remove(settings.mutedRole);
-      // `**Cрок Вашего мута истек.\n.\n---.**`
-      member.user
-        .send(
-          new MessageEmbed()
-            .setTitle('Срок Вашего мута истек')
-            .setDescription('Последующие нарушения могут привести к блокировке Вашего аккаунта'),
-        )
-        .catch(err => err);
+        member.roles.remove(settings.mutedRole);
+        // `**Cрок Вашего мута истек.\n.\n---.**`
+        member.user
+          .send(
+            new MessageEmbed()
+              .setTitle('Срок Вашего мута истек')
+              .setDescription('Последующие нарушения могут привести к блокировке Вашего аккаунта'),
+          )
+          .catch(err => err);
+      } else if (punishment.type === 1) {
+        Punishment.findByIdAndRemove(punishment.id).exec();
+      }
     });
   });
 };
@@ -55,4 +58,9 @@ exports.handleMemberAdd = async (client, member) => {
   if (mute) {
     await member.roles.add(role);
   }
+};
+
+exports.getPunishmentID = e => {
+  const arr = [...e._id.id.values()];
+  return arr[arr.length - 1];
 };
