@@ -1,6 +1,7 @@
 'use strict';
 
 const { MessageEmbed } = require('discord.js');
+const { ban } = require('../../handlers/moderators');
 const Punishment = require('../../models/Punishment');
 const Command = require('../../structures/Command');
 const { sendErrorMessage } = require('../../utils');
@@ -77,6 +78,19 @@ module.exports = class extends Command {
       reason: reason || 'Не указано',
     });
     await warn.save();
+
+    if (settings.warnsToBan > 0) {
+      const warns = await Punishment.find({
+        guildID: guild.id,
+        userID: member.id,
+        type: 1,
+      }).exec();
+
+      if (warns.length >= settings.warnsToBan) {
+        ban(guild, member.id, settings.banByWarnsDuration, 'Слишком много нарушений', message);
+        return;
+      }
+    }
 
     message.channel.send(new MessageEmbed().setTitle('[WARN]'));
   }

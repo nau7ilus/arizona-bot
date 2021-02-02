@@ -2,6 +2,7 @@
 
 const { MessageEmbed } = require('discord.js');
 const Punishment = require('../models/Punishment');
+const { sendErrorMessage, formatDuration } = require('../utils');
 const { moderationConfig } = require('../utils/config');
 
 exports.watchPunishments = client => {
@@ -35,6 +36,9 @@ exports.watchPunishments = client => {
           .catch(err => err);
       } else if (punishment.type === 1) {
         Punishment.findByIdAndRemove(punishment.id).exec();
+      } else if (punishment.type === 2) {
+        guild.members.unban(punishment.userID);
+        Punishment.findByIdAndRemove(punishment.id).exec();
       }
     });
   });
@@ -63,4 +67,35 @@ exports.handleMemberAdd = async (client, member) => {
 exports.getPunishmentID = e => {
   const arr = [...e._id.id.values()];
   return arr[arr.length - 1];
+};
+
+exports.ban = async (guild, memberID, duration, reason, message) => {
+  guild
+    .fetchBan(memberID)
+    .then(() => {
+      sendErrorMessage({
+        message,
+        content: 'Данный пользователь уже забанен!',
+        member: message.member,
+      });
+    })
+    .catch(async () => {
+      const user = await guild.members.ban(memberID, {
+        reason,
+      });
+
+      const ban = new Punishment({
+        guildID: guild.id,
+        userID: memberID,
+        moderID: message.member.id,
+        type: 2,
+        validUntil: Date.now() + duration,
+        reason: reason || 'Не указано',
+      });
+      await ban.save();
+
+      message.channel.send(
+        new MessageEmbed().setAuthor(`${user.username || user.id || user} был забанен на ${formatDuration(duration)}`),
+      );
+    });
 };

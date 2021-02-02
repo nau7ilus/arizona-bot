@@ -1406,6 +1406,8 @@ exports.moderationConfig = {
   '705117234544115713': {
     mutedRole: '799315127467900948',
     warnDuration: 1000 * 60 * 60 * 24 * 15,
+    warnsToBan: 5,
+    banByWarnsDuration: 1000 * 60 * 60 * 24 * 7,
     moderatorRoles: [''],
     inviolableRoles: [''],
   },
