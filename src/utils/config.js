@@ -1405,5 +1405,7 @@ exports.moderationConfig = {
   // TEST
   '705117234544115713': {
     mutedRole: '799315127467900948',
+    moderatorRoles: [''],
+    inviolableRoles: [''],
   },
 };

@@ -72,7 +72,7 @@ class Command extends AliasPiece {
         if (arg.pre && !arg.pre(args[i])) reject(this.invalidArguments(i));
 
         const regex = arg.regex || types[arg.type];
-        if (!args[i].match(regex)) reject(this.invalidArguments(i));
+        if (args[i] && !args[i].match(regex)) reject(this.invalidArguments(i));
       }
 
       resolve(args);
