@@ -3,7 +3,7 @@
 const { MessageEmbed } = require('discord.js');
 const Punishment = require('../../models/Punishment');
 const Command = require('../../structures/Command');
-const { resolveDuration, sendErrorMessage } = require('../../utils');
+const { resolveDuration, sendErrorMessage, formatDuration } = require('../../utils');
 const { moderationConfig } = require('../../utils/config');
 
 module.exports = class extends Command {
@@ -41,7 +41,7 @@ module.exports = class extends Command {
     if (!member) {
       sendErrorMessage({
         message,
-        content: 'Указанного пользователя нет на сервере',
+        content: 'Указанный пользователь не найден на сервере',
         member: message.member,
       });
       return;
@@ -50,7 +50,39 @@ module.exports = class extends Command {
     const role = guild.roles.cache.get(settings.mutedRole);
     if (!role) throw new Error('Роль Muted для этого сервера не найдена');
 
-    // TODO: check perms
+    if (
+      !message.member.hasPermission('ADMINISTRATOR') &&
+      !message.member.roles.cache.some(r => settings.moderatorRoles.includes(r.id))
+    ) {
+      sendErrorMessage({
+        message,
+        content: 'У вас нет прав!',
+        member: message.member,
+      });
+      return;
+    }
+
+    if (
+      member.user.bot ||
+      member.hasPermission('ADMINISTRATOR') ||
+      member.roles.cache.some(r => settings.inviolableRoles.includes(r.id))
+    ) {
+      sendErrorMessage({
+        message,
+        content: 'Вы не можете замутить этого пользователя!',
+        member: message.member,
+      });
+      return;
+    }
+
+    if (member.roles.cache.has(role.id)) {
+      sendErrorMessage({
+        message,
+        content: 'Этот пользователь уже замучен!',
+        member: message.member,
+      });
+      return;
+    }
 
     await member.roles.add(role);
     const mute = new Punishment({
@@ -63,6 +95,11 @@ module.exports = class extends Command {
     });
     await mute.save();
 
-    message.channel.send(new MessageEmbed().setTitle('[MUTE]'));
+    message.channel.send(
+      new MessageEmbed().setAuthor(
+        `${member.user.username} был замучен на ${formatDuration(duration)}`,
+        member.user.avatarURL(),
+      ),
+    );
   }
 };
