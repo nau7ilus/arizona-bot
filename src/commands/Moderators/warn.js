@@ -87,6 +87,11 @@ module.exports = class extends Command {
       }).exec();
 
       if (warns.length >= settings.warnsToBan) {
+        await Punishment.deleteMany({
+          guildID: guild.id,
+          userID: member.id,
+          type: 1,
+        }).exec();
         ban(guild, member.id, settings.banByWarnsDuration, 'Слишком много нарушений', message);
         return;
       }
