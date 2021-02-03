@@ -55,7 +55,6 @@ class Command extends AliasPiece {
     return new Promise((resolve, reject) => {
       const requiredArguments = Object.entries(this.arguments);
       if (requiredArguments.length === 0) resolve(args);
-      if (args.length === 0) reject(this.invalidArguments());
 
       if (requiredArguments.some(arg => arg[0] === 'spaceString')) {
         if (requiredArguments[requiredArguments.lastIndex] !== 'spaceString') {
