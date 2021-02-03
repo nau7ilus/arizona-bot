@@ -56,13 +56,15 @@ class Command extends AliasPiece {
       const requiredArguments = Object.entries(this.arguments);
       if (requiredArguments.length === 0) resolve(args);
 
-      if (requiredArguments.some(arg => arg[0] === 'spaceString')) {
-        if (requiredArguments[requiredArguments.lastIndex] !== 'spaceString') {
+      console.log(requiredArguments);
+      if (requiredArguments.some(arg => arg[1].type === 'spaceString')) {
+        if (requiredArguments[requiredArguments.length - 1][1].type !== 'spaceString') {
           throw new Error('Аргумент типа spaceString должен быть последним');
         }
 
-        args[requiredArguments.lastIndex] = args.slice(requiredArguments.lastIndex).join(' ');
+        args[requiredArguments.length - 1] = args.slice(requiredArguments.length - 1).join(' ');
       }
+      args = args.slice(0, requiredArguments.length);
 
       for (const i in requiredArguments) {
         const arg = requiredArguments[i][1];
