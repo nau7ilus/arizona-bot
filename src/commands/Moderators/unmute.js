@@ -64,13 +64,11 @@ module.exports = class extends Command {
 
     member.roles.remove(role);
 
-    const mute = await Punishment.findOne({
+    await Punishment.deleteOne({
       guildID: guild.id,
       userID: member.id,
       type: 0,
-    });
-
-    if (mute) Punishment.findByIdAndRemove(mute.id).exec();
+    }).exec();
 
     message.channel.send(
       new MessageEmbed().setAuthor(`${member.user.username} был размучен!`, member.user.avatarURL()),

@@ -1,6 +1,7 @@
 'use strict';
 
 const { MessageEmbed } = require('discord.js');
+const Punishment = require('../../models/Punishment');
 const Command = require('../../structures/Command');
 const { sendErrorMessage } = require('../../utils');
 const { moderationConfig } = require('../../utils/config');
@@ -55,5 +56,11 @@ module.exports = class extends Command {
           member: message.member,
         });
       });
+
+    await Punishment.deleteOne({
+      guildID: guild.id,
+      userID: memberID,
+      type: 2,
+    });
   }
 };
