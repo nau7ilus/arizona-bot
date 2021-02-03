@@ -56,7 +56,6 @@ class Command extends AliasPiece {
       const requiredArguments = Object.entries(this.arguments);
       if (requiredArguments.length === 0) resolve(args);
 
-      console.log(requiredArguments);
       if (requiredArguments.some(arg => arg[1].type === 'spaceString')) {
         if (requiredArguments[requiredArguments.length - 1][1].type !== 'spaceString') {
           throw new Error('Аргумент типа spaceString должен быть последним');
