@@ -40,7 +40,12 @@ exports.watchPunishments = client => {
         guild.members.unban(punishment.userID);
         Punishment.findByIdAndRemove(punishment.id).exec();
       } else if (punishment.type === 3) {
-        // TODO
+        const member = guild.member(punishment.userID);
+        if (!member) return;
+
+        Punishment.findByIdAndRemove(punishment.id).exec();
+
+        member.roles.remove(settings.noGainExpRole);
       } else if (punishment.type === 4) {
         const channel = guild.channels.resolve(punishment.channelID);
         if (!channel) return;
@@ -70,18 +75,26 @@ exports.handleMemberAdd = async (client, member) => {
   const settings = moderationConfig[guild.id];
   if (!settings) return;
 
-  const mute = await Punishment.findOne({
-    guildID: guild.id,
-    userID: member.id,
-    type: 0,
-    validUntil: { $gte: Date.now() },
-  });
+  if (
+    await Punishment.findOne({
+      guildID: guild.id,
+      userID: member.id,
+      type: 0,
+      validUntil: { $gte: Date.now() },
+    })
+  ) {
+    await member.roles.add(settings.mutedRole);
+  }
 
-  const role = guild.roles.cache.get(settings.mutedRole);
-  if (!role) throw new Error('Роль Muted для этого сервера не найдена');
-
-  if (mute) {
-    await member.roles.add(role);
+  if (
+    await Punishment.findOne({
+      guildID: guild.id,
+      userID: member.id,
+      type: 3,
+      validUntil: { $gte: Date.now() },
+    })
+  ) {
+    await member.roles.add(settings.noGainExpRole);
   }
 };
 
@@ -91,6 +104,9 @@ exports.getPunishmentID = e => {
 };
 
 exports.ban = async (guild, memberID, duration, reason, message) => {
+  const settings = moderationConfig[guild.id];
+  if (!settings) return;
+
   guild
     .fetchBan(memberID)
     .then(() => {
@@ -114,6 +130,16 @@ exports.ban = async (guild, memberID, duration, reason, message) => {
         reason: reason || 'Не указано',
       });
       await ban.save();
+
+      const noGainExp = new Punishment({
+        guildID: guild.id,
+        userID: memberID,
+        moderID: message.member.id,
+        type: 3,
+        validUntil: Date.now() + duration + settings.noGainExpDuration,
+        reason: reason || 'Не указано',
+      });
+      await noGainExp.save();
 
       message.channel.send(
         new MessageEmbed().setAuthor(`${user.username || user.id || user} был забанен на ${formatDuration(duration)}`),

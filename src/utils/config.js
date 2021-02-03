@@ -1404,7 +1404,27 @@ exports.newsConfig = {
 exports.moderationConfig = {
   // TEST
   '787224090171670539': {
-    mutedRole: '799315127467900948',
+    allowedCommands: [
+      'allowgainexp',
+      'ban',
+      'clear',
+      'kick',
+      'lock',
+      'mute',
+      'set-name',
+      'unban',
+      'unlock',
+      'unmute',
+      'unwarn',
+      'vkick',
+      'vmute',
+      'vunmute',
+      'warn',
+      'warns',
+    ],
+    mutedRole: '789192313377259560',
+    noGainExpRole: '806515459784572928',
+    noGainExpDuration: 1000 * 60 * 60 * 24 * 15,
     warnDuration: 1000 * 60 * 60 * 24 * 15,
     warnsToBan: 5,
     banByWarnsDuration: 1000 * 60 * 60 * 24 * 7,

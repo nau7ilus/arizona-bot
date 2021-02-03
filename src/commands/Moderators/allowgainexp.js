@@ -1,14 +1,14 @@
 'use strict';
 
-const { ban } = require('../../handlers/moderators');
+const Punishment = require('../../models/Punishment');
 const Command = require('../../structures/Command');
-const { resolveDuration, sendErrorMessage } = require('../../utils');
+const { sendErrorMessage } = require('../../utils');
 const { moderationConfig } = require('../../utils/config');
 
 module.exports = class extends Command {
   constructor(...args) {
     super(...args, {
-      name: 'ban',
+      name: 'allowgainexp',
       devOnly: true,
       userPermissions: ['ADMINISTRATOR'],
       arguments: {
@@ -16,14 +16,8 @@ module.exports = class extends Command {
           type: 'user',
           required: true,
         },
-        duration: {
-          type: 'time',
-          required: true,
-        },
-        reason: {
-          type: 'spaceString',
-        },
       },
+      aliases: ['alge'],
     });
   }
   // eslint-disable-next-line require-await
@@ -42,9 +36,7 @@ module.exports = class extends Command {
       return;
     }
 
-    const [memberString, durationString, reason] = args;
-
-    const duration = resolveDuration(durationString);
+    const [memberString] = args;
 
     const memberID = memberString.match(/\d{18}/)[0];
 
@@ -61,21 +53,14 @@ module.exports = class extends Command {
     }
 
     const member = guild.member(memberID);
-
-    if (
-      member &&
-      (member.user.bot ||
-        member.hasPermission('ADMINISTRATOR') ||
-        member.roles.cache.some(r => settings.inviolableRoles.includes(r.id)))
-    ) {
-      sendErrorMessage({
-        message,
-        content: 'Вы не можете забанить этого пользователя!',
-        member: message.member,
-      });
-      return;
+    if (member) {
+      member.roles.remove(settings.noGainExpRole);
     }
 
-    ban(guild, memberID, duration, reason, message);
+    await Punishment.deleteOne({
+      guildID: guild.id,
+      userID: memberID,
+      type: 3,
+    });
   }
 };
