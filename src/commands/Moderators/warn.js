@@ -30,7 +30,7 @@ module.exports = class extends Command {
     const settings = moderationConfig[guild.id];
     if (!settings) return;
 
-    if (!settings.allowedRoles.includes(this.name)) {
+    if (!settings.allowedCommands.includes(this.name)) {
       sendErrorMessage({
         message,
         content: 'Недоступно на этом сервере!',
