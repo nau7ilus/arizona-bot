@@ -39,6 +39,27 @@ exports.watchPunishments = client => {
       } else if (punishment.type === 2) {
         guild.members.unban(punishment.userID);
         Punishment.findByIdAndRemove(punishment.id).exec();
+      } else if (punishment.type === 3) {
+        // TODO
+      } else if (punishment.type === 4) {
+        const channel = guild.channels.resolve(punishment.channelID);
+        if (!channel) return;
+
+        Punishment.findByIdAndRemove(punishment.id).exec();
+
+        const overwrite = channel.permissionOverwrites.get(punishment.userID);
+        if (overwrite.deny.bitfield === 0x200000 && overwrite.allow.bitfield === 0) {
+          overwrite.delete();
+        } else {
+          overwrite.update({
+            SPEAK: null,
+          });
+        }
+
+        const member = guild.member(punishment.userID);
+        if (member && member.voice.channel === channel) {
+          member.voice.setChannel(channel);
+        }
       }
     });
   });
