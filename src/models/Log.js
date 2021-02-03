@@ -26,21 +26,16 @@ const { Schema, model } = require('mongoose');
  * 13. Lock
  * 14. Unlock
  *
- * Rules:
- * 15. Create
- * 16. Edit
- * 17. Add point
- *
  * Suggestions:
- * 18. Approve
- * 19. Consider
- * 20. Deny
- * 21. Implement
+ * 15. Approve
+ * 16. Consider
+ * 17. Deny
+ * 18. Implement
  *
  * Support:
- * 22. Active
- * 23. Close
- * 24. Hold
+ * 19. Active
+ * 20. Close
+ * 21. Hold
  */
 
 const LogSchema = new Schema(

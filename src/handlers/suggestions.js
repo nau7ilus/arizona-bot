@@ -2,6 +2,7 @@
 'use strict';
 
 const { MessageEmbed } = require('discord.js');
+const Log = require('../models/Log');
 const Suggestion = require('../models/Suggestion');
 const suggestionsConfig = require('../utils/config').suggestions;
 
@@ -127,4 +128,25 @@ exports.action = async (message, action) => {
       embed,
     );
   }
+
+  const logMessage = new Log({
+    usersID: [message.member.id, suggestionAuthor.id],
+    origin: message.member.id,
+    discordData: {
+      guildID: message.guild.id,
+      channelID: message.channel.id,
+      messageID: message.id,
+    },
+    actionID: {
+      approve: 15,
+      consider: 16,
+      deny: 17,
+      implement: 18,
+    }[action],
+    details: {
+      id: suggestionID,
+      reason,
+    },
+  });
+  await logMessage.save();
 };

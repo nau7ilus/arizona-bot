@@ -2,7 +2,7 @@
 'use strict';
 
 const { MessageEmbed } = require('discord.js');
-
+const Log = require('../models/Log');
 const supportConfig = require('../utils/config').supportSettings;
 
 // eslint-disable-next-line consistent-return
@@ -150,6 +150,22 @@ exports.action = (message, member, action, settings) => {
     if (logChannel) {
       logChannel.send(logEmbed(message.channel, member, action, true));
     }
+
+    const logMessage = new Log({
+      usersID: [message.member.id],
+      origin: message.member.id,
+      discordData: {
+        guildID: message.guild.id,
+        channelID: message.channel.id,
+        messageID: message.id,
+      },
+      actionID: {
+        active: 19,
+        close: 20,
+        hold: 21,
+      }[action],
+    });
+    logMessage.save();
   } catch (err) {
     console.error(err);
     sendError(message.channel, member, 'произошла ошибка при изменении статуса тикета');
