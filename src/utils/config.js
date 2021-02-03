@@ -1403,12 +1403,15 @@ exports.newsConfig = {
 
 exports.moderationConfig = {
   // TEST
-  '705117234544115713': {
+  '787224090171670539': {
     mutedRole: '799315127467900948',
     warnDuration: 1000 * 60 * 60 * 24 * 15,
     warnsToBan: 5,
     banByWarnsDuration: 1000 * 60 * 60 * 24 * 7,
-    moderatorRoles: [''],
+    usersForVoteban: 5,
+    usersForRejectVoteban: 3,
+    moderatorRoles: ['788314272567525388'],
+    headModeratorRoles: ['788115379473219656'],
     inviolableRoles: [''],
   },
 };
