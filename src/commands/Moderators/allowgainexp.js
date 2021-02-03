@@ -1,5 +1,6 @@
 'use strict';
 
+const Log = require('../../models/Log');
 const Punishment = require('../../models/Punishment');
 const Command = require('../../structures/Command');
 const { sendErrorMessage } = require('../../utils');
@@ -9,8 +10,6 @@ module.exports = class extends Command {
   constructor(...args) {
     super(...args, {
       name: 'allowgainexp',
-      devOnly: true,
-      userPermissions: ['ADMINISTRATOR'],
       arguments: {
         member: {
           type: 'user',
@@ -62,5 +61,17 @@ module.exports = class extends Command {
       userID: memberID,
       type: 3,
     });
+
+    const logMessage = new Log({
+      usersID: [message.member.id, memberID],
+      origin: message.member.id,
+      discordData: {
+        guildID: guild.id,
+        channelID: message.channel.id,
+        messageID: message.id,
+      },
+      actionID: 4,
+    });
+    await logMessage.save();
   }
 };

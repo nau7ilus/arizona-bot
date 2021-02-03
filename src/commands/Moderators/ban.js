@@ -1,6 +1,7 @@
 'use strict';
 
 const { ban } = require('../../handlers/moderators');
+const Log = require('../../models/Log');
 const Command = require('../../structures/Command');
 const { resolveDuration, sendErrorMessage } = require('../../utils');
 const { moderationConfig } = require('../../utils/config');
@@ -9,8 +10,6 @@ module.exports = class extends Command {
   constructor(...args) {
     super(...args, {
       name: 'ban',
-      devOnly: true,
-      userPermissions: ['ADMINISTRATOR'],
       arguments: {
         member: {
           type: 'user',
@@ -77,5 +76,21 @@ module.exports = class extends Command {
     }
 
     ban(guild, memberID, duration, reason, message);
+
+    const logMessage = new Log({
+      usersID: [message.member.id, memberID],
+      origin: message.member.id,
+      discordData: {
+        guildID: guild.id,
+        channelID: message.channel.id,
+        messageID: message.id,
+      },
+      actionID: 2,
+      details: {
+        duration,
+        reason,
+      },
+    });
+    await logMessage.save();
   }
 };

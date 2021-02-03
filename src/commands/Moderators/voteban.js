@@ -2,6 +2,7 @@
 
 const { MessageEmbed } = require('discord.js');
 const { ban } = require('../../handlers/moderators');
+const Log = require('../../models/Log');
 const Command = require('../../structures/Command');
 const { resolveDuration, sendErrorMessage } = require('../../utils');
 const { moderationConfig } = require('../../utils/config');
@@ -10,8 +11,6 @@ module.exports = class extends Command {
   constructor(...args) {
     super(...args, {
       name: 'voteban',
-      devOnly: true,
-      userPermissions: ['ADMINISTRATOR'],
       arguments: {
         member: {
           type: 'user',
@@ -174,6 +173,23 @@ function resolveBan(guild, message, memberID, duration, reason, msg, users) {
   );
 
   ban(guild, memberID, duration, reason, message);
+
+  const logMessage = new Log({
+    usersID: [message.member.id, memberID, ...users],
+    origin: message.member.id,
+    discordData: {
+      guildID: guild.id,
+      channelID: message.channel.id,
+      messageID: message.id,
+    },
+    actionID: 12,
+    details: {
+      reason,
+      duration,
+      approvedUsers: users,
+    },
+  });
+  logMessage.save();
 }
 
 function rejectBan(guild, message, memberID, msg, users) {

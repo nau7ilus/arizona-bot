@@ -1,6 +1,7 @@
 'use strict';
 
 const { MessageEmbed } = require('discord.js');
+const Log = require('../../models/Log');
 const Punishment = require('../../models/Punishment');
 const Command = require('../../structures/Command');
 const { sendErrorMessage } = require('../../utils');
@@ -10,8 +11,6 @@ module.exports = class extends Command {
   constructor(...args) {
     super(...args, {
       name: 'unmute',
-      devOnly: true,
-      userPermissions: ['ADMINISTRATOR'],
       arguments: {
         member: {
           type: 'user',
@@ -78,6 +77,18 @@ module.exports = class extends Command {
       userID: member.id,
       type: 0,
     }).exec();
+
+    const logMessage = new Log({
+      usersID: [message.member.id, member.id],
+      origin: message.member.id,
+      discordData: {
+        guildID: guild.id,
+        channelID: message.channel.id,
+        messageID: message.id,
+      },
+      actionID: 1,
+    });
+    await logMessage.save();
 
     message.channel.send(
       new MessageEmbed().setAuthor(`${member.user.username} был размучен!`, member.user.avatarURL()),

@@ -1,6 +1,7 @@
 'use strict';
 
 const { MessageEmbed } = require('discord.js');
+const Log = require('../../models/Log');
 const Punishment = require('../../models/Punishment');
 const Command = require('../../structures/Command');
 const { sendErrorMessage } = require('../../utils');
@@ -10,8 +11,6 @@ module.exports = class extends Command {
   constructor(...args) {
     super(...args, {
       name: 'unban',
-      devOnly: true,
-      userPermissions: ['ADMINISTRATOR'],
       arguments: {
         member: {
           type: 'user',
@@ -71,5 +70,17 @@ module.exports = class extends Command {
       userID: memberID,
       type: 2,
     });
+
+    const logMessage = new Log({
+      usersID: [message.member.id, memberID],
+      origin: message.member.id,
+      discordData: {
+        guildID: guild.id,
+        channelID: message.channel.id,
+        messageID: message.id,
+      },
+      actionID: 3,
+    });
+    await logMessage.save();
   }
 };

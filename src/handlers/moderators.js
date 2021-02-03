@@ -1,6 +1,7 @@
 'use strict';
 
 const { MessageEmbed } = require('discord.js');
+const Log = require('../models/Log');
 const Punishment = require('../models/Punishment');
 const { sendErrorMessage, formatDuration } = require('../utils');
 const { moderationConfig } = require('../utils/config');
@@ -25,6 +26,16 @@ exports.watchPunishments = client => {
 
         Punishment.findByIdAndRemove(punishment.id).exec();
 
+        const logMessage = new Log({
+          usersID: [client.user.id, punishment.userID],
+          origin: client.user.id,
+          discordData: {
+            guildID: guild.id,
+          },
+          actionID: 1,
+        });
+        logMessage.save();
+
         member.roles.remove(settings.mutedRole);
         // `**Cрок Вашего мута истек.\n.\n---.**`
         member.user
@@ -36,14 +47,45 @@ exports.watchPunishments = client => {
           .catch(err => err);
       } else if (punishment.type === 1) {
         Punishment.findByIdAndRemove(punishment.id).exec();
+
+        const logMessage = new Log({
+          usersID: [client.user.id, punishment.userID],
+          origin: client.user.id,
+          discordData: {
+            guildID: guild.id,
+          },
+          actionID: 6,
+        });
+        logMessage.save();
       } else if (punishment.type === 2) {
         guild.members.unban(punishment.userID);
+
+        const logMessage = new Log({
+          usersID: [client.user.id, punishment.userID],
+          origin: client.user.id,
+          discordData: {
+            guildID: guild.id,
+          },
+          actionID: 3,
+        });
+        logMessage.save();
+
         Punishment.findByIdAndRemove(punishment.id).exec();
       } else if (punishment.type === 3) {
         const member = guild.member(punishment.userID);
         if (!member) return;
 
         Punishment.findByIdAndRemove(punishment.id).exec();
+
+        const logMessage = new Log({
+          usersID: [client.user.id, punishment.userID],
+          origin: client.user.id,
+          discordData: {
+            guildID: guild.id,
+          },
+          actionID: 4,
+        });
+        logMessage.save();
 
         member.roles.remove(settings.noGainExpRole);
       } else if (punishment.type === 4) {
@@ -65,6 +107,19 @@ exports.watchPunishments = client => {
         if (member && member.voice.channel === channel) {
           member.voice.setChannel(channel);
         }
+
+        const logMessage = new Log({
+          usersID: [client.user.id, punishment.userID],
+          origin: client.user.id,
+          discordData: {
+            guildID: guild.id,
+          },
+          actionID: 10,
+          details: {
+            channelID: channel.id,
+          },
+        });
+        logMessage.save();
       }
     });
   });

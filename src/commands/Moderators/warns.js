@@ -11,8 +11,6 @@ module.exports = class extends Command {
   constructor(...args) {
     super(...args, {
       name: 'warns',
-      devOnly: true,
-      userPermissions: ['ADMINISTRATOR'],
       arguments: {
         member: {
           type: 'user',

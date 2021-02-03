@@ -1,6 +1,7 @@
 'use strict';
 
 const { MessageEmbed } = require('discord.js');
+const Log = require('../../models/Log');
 const Command = require('../../structures/Command');
 const { sendErrorMessage } = require('../../utils');
 const { moderationConfig } = require('../../utils/config');
@@ -9,8 +10,6 @@ module.exports = class extends Command {
   constructor(...args) {
     super(...args, {
       name: 'lock',
-      devOnly: true,
-      userPermissions: ['ADMINISTRATOR'],
       arguments: {
         channel: {
           type: 'channel',
@@ -64,6 +63,18 @@ module.exports = class extends Command {
         deny: ['SEND_MESSAGES'],
       },
     ]);
+
+    const logMessage = new Log({
+      usersID: [message.member.id],
+      origin: message.member.id,
+      discordData: {
+        guildID: guild.id,
+        channelID: channel.id,
+        messageID: message.id,
+      },
+      actionID: 13,
+    });
+    await logMessage.save();
 
     message.channel.send(
       new MessageEmbed().setAuthor(

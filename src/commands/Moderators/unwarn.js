@@ -2,6 +2,7 @@
 
 const { MessageEmbed } = require('discord.js');
 const { getPunishmentID } = require('../../handlers/moderators');
+const Log = require('../../models/Log');
 const Punishment = require('../../models/Punishment');
 const Command = require('../../structures/Command');
 const { sendErrorMessage } = require('../../utils');
@@ -11,8 +12,6 @@ module.exports = class extends Command {
   constructor(...args) {
     super(...args, {
       name: 'unwarn',
-      devOnly: true,
-      userPermissions: ['ADMINISTRATOR'],
       arguments: {
         member: {
           type: 'user',
@@ -80,6 +79,18 @@ module.exports = class extends Command {
       });
       return;
     }
+
+    const logMessage = new Log({
+      usersID: [message.member.id, member.id],
+      origin: message.member.id,
+      discordData: {
+        guildID: guild.id,
+        channelID: message.channel.id,
+        messageID: message.id,
+      },
+      actionID: 6,
+    });
+    await logMessage.save();
 
     await Punishment.findByIdAndDelete(warn._id).exec();
 

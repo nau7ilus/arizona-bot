@@ -8,8 +8,6 @@ module.exports = class extends Command {
   constructor(...args) {
     super(...args, {
       name: 'clear',
-      devOnly: true,
-      userPermissions: ['ADMINISTRATOR'],
       arguments: {
         'length or member': {
           type: 'number',
