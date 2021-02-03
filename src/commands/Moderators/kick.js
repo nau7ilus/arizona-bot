@@ -28,6 +28,15 @@ module.exports = class extends Command {
     const settings = moderationConfig[guild.id];
     if (!settings) return;
 
+    if (!settings.allowedRoles.includes(this.name)) {
+      sendErrorMessage({
+        message,
+        content: 'Недоступно на этом сервере!',
+        member: message.member,
+      });
+      return;
+    }
+
     const [memberString, reason] = args;
 
     const member = guild.member(memberString.match(/\d{18}/)[0]);
