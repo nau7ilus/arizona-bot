@@ -114,14 +114,6 @@ exports.createTicket = async (client, reaction, reactedUser, settings) => {
 };
 
 exports.action = (message, member, action, settings) => {
-  // Check if ticket is valid
-  if (
-    !message.channel.name.startsWith('ticket-') ||
-    !Object.values(settings.categories).includes(message.channel.parentID)
-  ) {
-    return true;
-  }
-
   // Check user perms
   if (!member.hasPermission('ADMINISTRATOR') && !member.roles.cache.some(r => settings.moderators.includes(r.id))) {
     return sendError(message.channel, member, 'у вас нет прав на использование этой команды', 3000);
@@ -191,15 +183,16 @@ exports.handleReactions = (client, reaction, reactedUser) => {
   const { message } = reaction;
   const member = message.guild.member(reactedUser);
   const isSupport = message.channel.id === settings.channelID;
-
-  if ((reaction.emoji.name === '✏️' && !isSupport) || ['🔒', '📌', '📬'].includes(reaction.emoji.name)) {
+  const isTicket = message.channel.name.startsWith('ticket-') && Object.values(settings.categories).includes(message.channel.parentID)
+  
+  if ((reaction.emoji.name === '✏️' && !isSupport) || isTicket) {
     reaction.users.remove(member.user);
   }
 
   if (reaction.emoji.name === '✏️' && isSupport) exports.createTicket(client, reaction, reactedUser, settings);
-  else if (reaction.emoji.name === '🔒') exports.action(message, member, 'close', settings, reaction);
-  else if (reaction.emoji.name === '📌') exports.action(message, member, 'hold', settings, reaction);
-  else if (reaction.emoji.name === '📬') exports.action(message, member, 'active', settings, reaction);
+  else if (reaction.emoji.name === '🔒' && isTicket) exports.action(message, member, 'close', settings, reaction);
+  else if (reaction.emoji.name === '📌' && isTicket) exports.action(message, member, 'hold', settings, reaction);
+  else if (reaction.emoji.name === '📬' && isTicket) exports.action(message, member, 'active', settings, reaction);
 };
 
 exports.watchTickets = client => {
