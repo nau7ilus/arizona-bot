@@ -2,6 +2,8 @@
 
 const { Schema, model } = require('mongoose');
 
+// TODO: Добавить target, перенести usersID в discordData, возможно оптимизировать строки на сайте.
+
 /**
  * Moderators:
  * 0. Mute
