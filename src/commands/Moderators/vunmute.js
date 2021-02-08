@@ -95,12 +95,13 @@ module.exports = class extends Command {
     }).exec();
 
     const logMessage = new Log({
-      usersID: [message.member.id, member.id],
       origin: message.member.id,
+      target: member.id,
       discordData: {
-        guildID: guild.id,
-        channelID: message.channel.id,
-        messageID: message.id,
+        guildsID: [guild.id],
+        channelsID: [message.channel.id, channel.id],
+        messagesID: [message.id],
+        usersID: [message.member.id, member.id],
       },
       actionID: 10,
       details: {

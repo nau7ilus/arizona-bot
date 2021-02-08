@@ -88,12 +88,13 @@ module.exports = class extends Command {
     await warn.save();
 
     const logMessage = new Log({
-      usersID: [message.member.id, member.id],
       origin: message.member.id,
+      target: member.id,
       discordData: {
-        guildID: guild.id,
-        channelID: message.channel.id,
-        messageID: message.id,
+        guildsID: [guild.id],
+        channelsID: [message.channel.id],
+        messagesID: [message.id],
+        usersID: [message.member.id, member.id],
       },
       actionID: 5,
       details: {
@@ -118,12 +119,13 @@ module.exports = class extends Command {
         ban(guild, member.id, settings.banByWarnsDuration, 'Слишком много нарушений', message);
 
         const banLogMessage = new Log({
-          usersID: [this.client.user.id, member.id],
           origin: this.client.user.id,
+          target: member.id,
           discordData: {
-            guildID: guild.id,
-            channelID: message.channel.id,
-            messageID: message.id,
+            guildsID: [guild.id],
+            channelsID: [message.channel.id],
+            messagesID: [message.id],
+            usersID: [this.client.user.id, member.id],
           },
           actionID: 2,
           details: {

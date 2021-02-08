@@ -63,12 +63,13 @@ module.exports = class extends Command {
     });
 
     const logMessage = new Log({
-      usersID: [message.member.id, memberID],
       origin: message.member.id,
+      target: memberID,
       discordData: {
-        guildID: guild.id,
-        channelID: message.channel.id,
-        messageID: message.id,
+        guildsID: [guild.id],
+        channelsID: [message.channel.id],
+        messagesID: [message.id],
+        usersID: [message.member.id, memberID],
       },
       actionID: 4,
     });

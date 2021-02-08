@@ -2,8 +2,6 @@
 
 const { Schema, model } = require('mongoose');
 
-// TODO: Добавить target, перенести usersID в discordData, возможно оптимизировать строки на сайте.
-
 /**
  * Moderators:
  * 0. Mute
@@ -42,12 +40,13 @@ const { Schema, model } = require('mongoose');
 
 const LogSchema = new Schema(
   {
-    usersID: { type: [String], required: true },
     origin: { type: String, required: true },
+    target: { type: String, required: true },
     discordData: {
-      guildID: { type: String },
-      channelID: { type: String },
-      messageID: { type: String },
+      guildsID: { type: [String] },
+      channelsID: { type: [String] },
+      messagesID: { type: [String] },
+      usersID: { type: [String] },
     },
     actionID: { type: Number, required: true },
     createdAt: { type: Date, default: Date.now },
