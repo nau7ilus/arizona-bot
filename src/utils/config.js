@@ -1421,6 +1421,7 @@ exports.moderationConfig = {
       'vunmute',
       'warn',
       'warns',
+      'voteban',
     ],
     mutedRole: '789192313377259560',
     noGainExpRole: '806515459784572928',
