@@ -27,10 +27,11 @@ exports.watchPunishments = client => {
         Punishment.findByIdAndRemove(punishment.id).exec();
 
         const logMessage = new Log({
-          usersID: [client.user.id, punishment.userID],
           origin: client.user.id,
+          target: punishment.userID,
           discordData: {
-            guildID: guild.id,
+            guildsID: [guild.id],
+            usersID: [client.user.id, punishment.userID],
           },
           actionID: 1,
         });
@@ -49,10 +50,11 @@ exports.watchPunishments = client => {
         Punishment.findByIdAndRemove(punishment.id).exec();
 
         const logMessage = new Log({
-          usersID: [client.user.id, punishment.userID],
           origin: client.user.id,
+          target: punishment.userID,
           discordData: {
-            guildID: guild.id,
+            guildsID: [guild.id],
+            usersID: [client.user.id, punishment.userID],
           },
           actionID: 6,
         });
@@ -61,10 +63,11 @@ exports.watchPunishments = client => {
         guild.members.unban(punishment.userID);
 
         const logMessage = new Log({
-          usersID: [client.user.id, punishment.userID],
           origin: client.user.id,
+          target: punishment.userID,
           discordData: {
-            guildID: guild.id,
+            guildsID: [guild.id],
+            usersID: [client.user.id, punishment.userID],
           },
           actionID: 3,
         });
@@ -78,10 +81,11 @@ exports.watchPunishments = client => {
         Punishment.findByIdAndRemove(punishment.id).exec();
 
         const logMessage = new Log({
-          usersID: [client.user.id, punishment.userID],
           origin: client.user.id,
+          target: punishment.userID,
           discordData: {
-            guildID: guild.id,
+            guildsID: [guild.id],
+            usersID: [client.user.id, punishment.userID],
           },
           actionID: 4,
         });
@@ -109,10 +113,11 @@ exports.watchPunishments = client => {
         }
 
         const logMessage = new Log({
-          usersID: [client.user.id, punishment.userID],
           origin: client.user.id,
+          target: punishment.userID,
           discordData: {
-            guildID: guild.id,
+            guildsID: [guild.id],
+            usersID: [client.user.id, punishment.userID],
           },
           actionID: 10,
           details: {
