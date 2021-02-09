@@ -69,7 +69,7 @@ module.exports = class extends Command {
       target: channel.id,
       discordData: {
         guildsID: [guild.id],
-        channelsID: [message.channels.id, channel.id],
+        channelsID: [message.channel.id, channel.id],
         messagesID: [message.id],
         usersID: [message.member.id],
       },
