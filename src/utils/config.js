@@ -1455,7 +1455,7 @@ exports.rolebyreactionConfig = {
   // Winslow
   '772869388147490846': {
     channel: '795661418556162058',
-    emoji: '<:Press_F:805814668638945281>',
+    emoji: '✅',
     role: '809429568188317707',
     embed: {
       title: 'Подписка на Winslow News.',
