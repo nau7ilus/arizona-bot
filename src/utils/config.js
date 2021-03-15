@@ -834,7 +834,7 @@ exports.protectionConfig = {
   // Soldatov Squad
   '690300502486941697': {
     notifyChannel: '821139817390669856',
-    role: '788152973607698452',
+    role: '821139986777767956',
     notifyRoles: ['690300539216331033'],
     bannedRoles: [
       '805408434819170325',
