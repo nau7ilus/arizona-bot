@@ -98,6 +98,7 @@ exports.localizePerm = perm => {
     DEAFEN_MEMBERS: 'Отключать звук',
     MOVE_MEMBERS: 'Перемещать участников',
     USE_VAD: 'Приоритетный режим',
+    STREAM: 'Демонстрация экрана',
 
     CHANGE_NICKNAME: 'Изменить ник',
     MANAGE_NICKNAMES: 'Управление никнеймами',
