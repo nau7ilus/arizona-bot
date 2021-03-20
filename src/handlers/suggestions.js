@@ -119,6 +119,11 @@ exports.action = async (message, action) => {
     approvedChannel.send(embed);
   }
 
+  const considerChannel = message.guild.channels.cache.get(settings.considerChannelID);
+  if (considerChannel && ['consider'].includes(action)) {
+    considerChannel.send(embed);
+  }
+
   const suggestionAuthor = message.client.users.cache.get(suggestion.authorID);
   if (suggestionAuthor) {
     suggestionAuthor.send(
