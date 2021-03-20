@@ -38,12 +38,6 @@ exports.handleMemberUpdate = async (client, oldMember, newMember) => {
       const oldRoles = executor.roles.cache.filter(
         r => (executor.id !== newMember.id || !newRoles.has(r.id)) && r.id !== guild.id,
       );
-      const oldRolesID = [];
-      oldRoles.forEach(r => oldRolesID.push(r.id));
-
-      // Преобразование выданных ролей в строку
-      const newRolesString = [];
-      newRoles.forEach(r => newRolesString.push(r.toString()));
 
       const channel = guild.channels.cache.get(settings.notifyChannel);
 
@@ -53,11 +47,11 @@ exports.handleMemberUpdate = async (client, oldMember, newMember) => {
         .setAuthor(executor.displayName, executor.user.avatarURL())
         .setTitle('Снят системой безопасности')
         .setDescription(
-          `**${executor} выдал рол${newRolesString.length === 1 ? 'ь' : 'и'}:
-          ${newRolesString.join(' ')}
+          `**${executor} выдал рол${newRoles.length === 1 ? 'ь' : 'и'}:
+          ${newRoles.map(r => r.toString()).join(', ')}
           Пользователю ${newMember}**`,
         )
-        .addField('Снятые роли:', oldRolesID.join('\n'))
+        .addField('Снятые роли:', oldRoles.map(r => r.toString()).join('\n'))
         .setFooter(executor.id)
         .setTimestamp();
 
@@ -67,6 +61,70 @@ exports.handleMemberUpdate = async (client, oldMember, newMember) => {
       await msg.pin();
 
       await newMember.roles.remove(newRoles);
+      await executor.roles.remove(executor.roles.cache.filter(r => !r.managed));
+      await executor.roles.add(settings.role);
+    }
+  }
+
+  // Если роли cнялись
+  // TODO: Дубликат кода, надо переписать
+  if (oldMember.roles.cache.size > newMember.roles.cache.size) {
+    const removedRoles = oldMember.roles.cache.filter(r => !newMember.roles.cache.has(r.id));
+
+    // Запрос данных из журнала аудита
+    // Мы получаем все строки по изменению ролей пользователя. Их надо отфильтровать
+    // таким образом, чтобы мы получили строки о определнном пользователе,
+    // роль была снята и все новые роли одинаковы с теми, что мы получили
+    const audit = await guild.fetchAuditLogs({ type: 25 });
+    const entry = audit.entries.find(
+      e =>
+        e.target.id === newMember.id &&
+        e.changes.some(change => change.key === '$remove') &&
+        e.changes.every(i => i.new.every(j => removedRoles.has(j.id))),
+    );
+    //         ,
+
+    const executor = guild.member(entry.executor);
+
+    // Проверка прав нарушителя
+    if (
+      executor.hasPermission('ADMINISTRATOR') ||
+      executor.roles.cache.some(r => settings.allowedRoles.includes(r.id))
+    ) {
+      return;
+    }
+
+    // Если выдана запрещенная роль
+    if (removedRoles.some(r => settings.bannedRoles.includes(r.id))) {
+      // Сохранение старых ролей пользователя
+      const oldRoles = executor.roles.cache.filter(
+        r => (executor.id !== newMember.id || !removedRoles.has(r.id)) && r.id !== guild.id,
+      );
+      const oldRolesID = [];
+      oldRoles.forEach(r => oldRolesID.push(r.id));
+
+      const channel = guild.channels.cache.get(settings.notifyChannel);
+
+      // Формирование embed
+      const embed = new MessageEmbed()
+        .setColor('RED')
+        .setAuthor(executor.displayName, executor.user.avatarURL())
+        .setTitle('Снят системой безопасности')
+        .setDescription(
+          `**${executor} снял рол${removedRoles.length === 1 ? 'ь' : 'и'}:
+            ${removedRoles.map(r => `<@&${r.id}>`).join(', ')}
+            Пользователю ${newMember}**`,
+        )
+        .addField('Снятые роли:', oldRolesID.map(i => `<@&${i}>`).join('\n'))
+        .setFooter(executor.id)
+        .setTimestamp();
+
+      const msg = await channel.send(`<@&${settings.notifyRoles.join('> <@&')}>`, embed);
+
+      await msg.react('👍');
+      await msg.pin();
+
+      await newMember.roles.add(removedRoles);
       await executor.roles.remove(executor.roles.cache.filter(r => !r.managed));
       await executor.roles.add(settings.role);
     }
@@ -120,9 +178,7 @@ exports.handleReactions = async (client, reaction, reactedUser) => {
   if (!member) return;
 
   // Формирование массива потерянных ролей
-  const rolesID = embed.fields[0].value.split('\n');
-  const roles = [];
-  rolesID.forEach(id => roles.push(guild.roles.cache.get(id)));
+  const roles = embed.fields[0].value.split('\n').map(r => r.split('<@&')[1].split('>')[0]);
 
   // Изменение сообщения с embed'ом
   embed
