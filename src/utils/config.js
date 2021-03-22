@@ -255,6 +255,11 @@ exports.familyConfig = {
     categoryID: '788109236252311662',
     baseRoleID: '788115379473219656',
   },
+  // Winslow
+  '772869388147490846': {
+    categoryID: '814234873769885726',
+    baseRoleID: '814235308241059880',
+  },
 };
 
 exports.meetingConfig = {
