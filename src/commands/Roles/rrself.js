@@ -36,7 +36,7 @@ module.exports = class extends Command {
 
     const embed = new MessageEmbed()
         .setColor('random')
-        .setDescription(`Вы успешно сняли из себя роли: ${roles.join()}`)
+        .setDescription(`Вы успешно сняли с себя роли: ${roles.join()}`)
     const msg = await message.send(embed)
 
     msg.delete({ timeout: 5 * 6000 })
