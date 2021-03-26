@@ -1591,3 +1591,10 @@ exports.newsConfig = {
     allowedRoles: ['695387225642238014'],
   },
 };
+
+exports.rrselfConfig = {
+  // Winslow
+  '772869388147490846': {
+    roles: ["772869388180783171", "772869388188647489"]
+  },
+};
