@@ -53,6 +53,7 @@ exports.suggestions = {
   '772869388147490846': {
     channelID: '791763975108952064',
     approvedChannelID: '791820269890043935',
+    considerChannelID: '825292613522948148',
     moderators: ['772869388297961504', '772869388297961506', '772869388297961503', '772869388297961505'],
   },
   // Winslow Informals
