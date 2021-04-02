@@ -3,7 +3,7 @@
 const { MessageEmbed } = require('discord.js');
 const Command = require('../../structures/Command');
 const { sendErrorMessage } = require('../../utils');
-const rrselfConfig = require('../../utils/config').rrselfConfig;
+const config = require('../../utils/config').rrselfConfig;
 
 module.exports = class extends Command {
   constructor(...args) {
@@ -12,27 +12,27 @@ module.exports = class extends Command {
     });
   }
   async run({ args, message }) {
-    
     message.delete()
+    
+    
     const rolesToRemove = config.roles.filter(r => message.member.roles.cache.has(r));
     const unsuccessRoles = [];
-    const settings = rrselfConfig[message.guild.id]
-
-    rolesToRemove.forEach(r => {if (roles.length === 0) {
-      sendErrorMessage({
-        message,
-        content: 'Роли для снятия не найдены',
-        member: message.member,
-        react: false
-      })
-      return
-    }
-
-    message.member.roles.remove(r).catch(err => {
-// handle err
-unsuccessRoles.push({ id: r, reason: err.message });
-});
-});
+    
+    rolesToRemove.forEach(r => {
+        if (roles.length === 0) {
+          sendErrorMessage({
+            message,
+            content: 'Роли для снятия не найдены',
+            member: message.member,
+            react: false
+          })
+          return
+        }
+        message.member.roles.remove(r).catch(err => {
+    // handle err
+    unsuccessRoles.push({ id: r, reason: err.message });
+      });
+    });
 
     const embed = new MessageEmbed()
         .setColor('#2ECC71')
@@ -40,4 +40,4 @@ unsuccessRoles.push({ id: r, reason: err.message });
         .setDescription(`Вы успешно сняли с себя роли: ${roles.join()}`);
     const msg = await message.channel.send(embed)
 }
-};
+  };
