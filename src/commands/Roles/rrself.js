@@ -20,7 +20,7 @@ module.exports = class extends Command {
       return message.channel.send(
         new MessageEmbed()
           .setColor('#E74C3C')
-          .setTitle(' no_entry | Ошибка при исполнении команды ')
+          .setTitle(' :no_entry: | Ошибка при исполнении команды ')
           .setDescription(' В данный момент вы не можете использовать эту команду:')
           .addField('Пользователь:', message.member),
       );
