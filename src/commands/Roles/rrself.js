@@ -6,6 +6,7 @@ const plural = require('plural-ru');
 const Command = require('../../structures/Command');
 const { sendErrorMessage } = require('../../utils');
 const { rrselfConfig } = require('../../utils/config');
+const talkedRecently = new Set();
 
 module.exports = class extends Command {
   constructor(...args) {
