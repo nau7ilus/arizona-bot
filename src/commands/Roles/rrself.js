@@ -14,9 +14,28 @@ module.exports = class extends Command {
     });
   }
   async run({ message }) {
+    const msg = message;
+    if (talkedRecently.has(msg.author.id)) {
+      return message.channel.send(
+        new MessageEmbed()
+          .setColor('#E74C3C')
+          .setTitle(' no_entry | Ошибка при исполнении команды ')
+          .setDescription(' В данный момент вы не можете использовать эту команду:')
+          .addField('Пользователь:', message.member),
+      );
+    }
+
+talkedRecently.add(msg.author.id);
+
+  setTimeout(() => {
+
+    talkedRecently.delete(msg.author.id);
+
+  }, 1440000 * 24);
+  // после кода с кд проверка на наличие ролей из конфига
     const config = rrselfConfig[message.guild.id];
     if (!config) return;
-
+  
     const roleIDsToRemove = config.roles.filter(r => message.member.roles.cache.has(r));
     const successRoles = [];
     const unsuccessRoles = [];
