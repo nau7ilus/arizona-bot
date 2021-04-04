@@ -38,16 +38,16 @@ exports.privateConfig = {
 };
 
 exports.rulesConfig = {
-  // Winslow
-  '772869388147490846': {
+   // Winslow
+   '772869388147490846': {
     channel: '772869389929676854',
+    moderators: '772869388297961506',
   },
   // Red-Rock
   '470981734863994881': {
     channel: '714123593646342151',
   },
 };
-
 exports.suggestions = {
   // Winslow
   '772869388147490846': {

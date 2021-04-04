@@ -1,13 +1,15 @@
 'use strict';
 
 const Command = require('../../structures/Command');
+const { moderator } = require('../../handlers/rules');
+const { MessageEmbed } = require('discord.js');
 const rulesConfig = require('../../utils/config').rulesConfig;
+const { sendErrorMessage } = require('../../utils/index');
 
 module.exports = class extends Command {
   constructor(...args) {
     super(...args, {
       name: 'addpoint',
-      devOnly: true,
     });
   }
   // eslint-disable-next-line require-await
@@ -15,6 +17,15 @@ module.exports = class extends Command {
     const guild = message.guild;
     const settings = rulesConfig[guild.id];
     if (!settings) return;
+
+    if (!moderator(message.member, settings)) {
+      return sendErrorMessage({
+        message: message,
+        content: 'у вас нет прав на использование данной команды.',
+        member: message.member,
+        react: false,
+      }); 
+    }
 
     const channel = guild.channels.cache.get(settings.channel);
     if (!channel) return;
