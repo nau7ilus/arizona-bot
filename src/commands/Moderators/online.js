@@ -6,6 +6,7 @@ const plural = require('plural-ru');
 
 const { getOnline } = require('../../handlers/online');
 const Command = require('../../structures/Command');
+const { sendErrorMessage } = require('../../utils');
 const allSettings = require('../../utils/config').onlineSettings;
 
 const numbers = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'];
@@ -114,28 +115,33 @@ module.exports = class extends Command {
     }
 
     // Check if member is moderator
-    const isModer =
+    const leaders =
       message.member.hasPermission('ADMINISTRATOR') ||
-      message.member.roles.cache.some(r => settings.moderators.includes(r.id));
+      message.member.roles.cache.some(r => settings.leaders.includes(r.id));
 
     // If user's moder and there's no specified fraction ID
-    if (isModer && !args[0]) {
+    if (leaders && !args[0]) {
       return this.sendError(message, 'Вы должны указать ID фракции: `/online <id>`');
     }
 
     // Get fraction ID to find by member's roles
-    const fractionIDs = isModer
+    const fractionIDs = leaders
       ? [args[0]]
       : Object.entries(settings.fractionsByRoles).filter(r =>
           message.member.roles.cache.some(i => r[1].includes(i.id)),
         );
 
     // If user has not any fraction to show online
-    if (!isModer && !fractionIDs.length) {
-      return this.sendError(message, 'У вас нет доступа к просмотру онлайна фракций');
+    if (!leaders && !fractionIDs.length) {
+      return sendErrorMessage({
+        message,
+        content: 'Вы не можете использовать данную команду',
+        member: message.member,
+        react: false,
+      });
     }
 
-    if (!isModer && fractionIDs.length > 1) {
+    if (!leaders && fractionIDs.length > 1) {
       return this.awaitFractions(message, fractionIDs);
     }
 
