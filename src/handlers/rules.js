@@ -11,9 +11,11 @@ exports.moderator = (member, settings) =>
     if (!settings) return;
   
     if (!exports.moderator(message.member, settings)) {
-      return message.channel.send(
-        message.member,
-        new MessageEmbed().setColor('RED').setTitle('У вас нет прав на использование данной команды'),
-      );
+        return sendErrorMessage({
+            message: message,
+            content: 'у вас нет прав на использование данной команды.',
+            member: message.member,
+            react: false,
+          }); 
+        }
     }
-  };
