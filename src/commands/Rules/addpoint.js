@@ -2,12 +2,12 @@
 
 const Command = require('../../structures/Command');
 const rulesConfig = require('../../utils/config').rulesConfig;
+const { sendErrorMessage } = require('../../utils/index');
 
 module.exports = class extends Command {
   constructor(...args) {
     super(...args, {
       name: 'addpoint',
-      devOnly: true,
     });
   }
   // eslint-disable-next-line require-await
@@ -15,6 +15,16 @@ module.exports = class extends Command {
     const guild = message.guild;
     const settings = rulesConfig[guild.id];
     if (!settings) return;
+
+    if (!isModerator(message.member, settings.moderators)) {
+      sendErrorMessage({
+        message: message,
+        content: 'у вас нет прав на использование данной команды.',
+        member: message.member,
+        react: false,
+      });
+      return;
+    }
 
     const channel = guild.channels.cache.get(settings.channel);
     if (!channel) return;
@@ -110,3 +120,8 @@ module.exports = class extends Command {
     }
   }
 };
+
+// TODO: Перенести в общие утилиты
+function isModerator(member, roles) {
+  return member.hasPermission('ADMINISTRATOR') || member.roles.cache.some(r => roles.includes(r));
+}
