@@ -48,6 +48,7 @@ exports.rulesConfig = {
     channel: '714123593646342151',
   },
 };
+
 exports.suggestions = {
   // Winslow
   '772869388147490846': {
