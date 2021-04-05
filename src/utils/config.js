@@ -38,8 +38,8 @@ exports.privateConfig = {
 };
 
 exports.rulesConfig = {
-   // Winslow
-   '772869388147490846': {
+  // Winslow
+  '772869388147490846': {
     channel: '772869389929676854',
     moderators: '772869388297961506',
   },

@@ -3,8 +3,6 @@
 const fs = require('fs');
 const https = require('https');
 const Command = require('../../structures/Command');
-const { moderator } = require('../../handlers/rules');
-const { MessageEmbed } = require('discord.js');
 const rulesConfig = require('../../utils/config').rulesConfig;
 const { sendErrorMessage } = require('../../utils/index');
 
@@ -19,13 +17,15 @@ module.exports = class extends Command {
     const guild = message.guild;
     const settings = rulesConfig[guild.id];
     if (!settings) return;
-    if (!moderator(message.member, settings)) {
-      return sendErrorMessage({
-          message: message,
-          content: 'у вас нет прав на использование данной команды.',
-          member: message.member,
-          react: false,
-        }); 
+
+    if (!isModerator(message.member, settings.moderators)) {
+      sendErrorMessage({
+        message: message,
+        content: 'у вас нет прав на использование данной команды.',
+        member: message.member,
+        react: false,
+      });
+      return;
     }
 
     const channel = guild.channels.cache.get(settings.channel);
@@ -45,8 +45,9 @@ module.exports = class extends Command {
       return;
     }
 
-    await message.channel.send(`**Отправьте новое содержимое группы правил (без форматирования)
-Для отмены введите \`-\`**`);
+    await message.channel.send(
+      ['**Отправьте новое содержимое группы правил (без форматирования)', 'Для отмены введите `-`**'].join('\n'),
+    );
 
     const content = await message.channel
       .awaitMessages(m => m.author.id === message.author.id, {
@@ -162,4 +163,9 @@ function getAttachmentContent(attachment) {
       }
     });
   });
+}
+
+// TODO: Перенести в общие утилиты
+function isModerator(member, roles) {
+  return member.hasPermission('ADMINISTRATOR') || member.roles.cache.some(r => roles.includes(r));
 }
