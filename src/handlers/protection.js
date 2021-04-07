@@ -1,137 +1,156 @@
+/* eslint-disable consistent-return */
 'use strict';
 
-const { MessageEmbed } = require('discord.js');
+const { MessageEmbed, GuildAuditLogs } = require('discord.js');
+const { Actions: AuditActions } = GuildAuditLogs;
 const protectionConfig = require('../utils/config').protectionConfig;
 
-exports.handleMemberUpdate = async (client, oldMember, newMember) => {
+const Actions = {
+  Given: 0,
+  Removed: 1,
+  Created: 2,
+  Deleted: 3,
+  Updated: 4,
+};
+
+const RoleAuditActions = {
+  [Actions.Created]: AuditActions.ROLE_CREATE,
+  [Actions.Deleted]: AuditActions.ROLE_DELETE,
+  [Actions.Updated]: AuditActions.ROLE_UPDATE,
+};
+
+const Phrases = {
+  0: 'выдал',
+  1: 'снял',
+  2: 'создал',
+  3: 'удалил',
+  4: 'обновил',
+};
+
+const endPhase = async ({ settings, executor, actionType, changedRoles, newMember }) => {
+  const { guild } = executor;
+
+  if (!settings.notifyChannel) return console.error('Notify channel not found');
+  const notifyChannel = guild.channels.cache.get(settings.notifyChannel);
+  if (!notifyChannel) return console.error('Notify channel not found on server');
+
+  const embed = new MessageEmbed()
+    .setColor('RED')
+    .setAuthor(executor.displayName, executor.user.displayAvatarURL({ dynamic: true }))
+    .setTitle('**💂 | Защита ролей**')
+    .setDescription(
+      `**${executor} ${Phrases[actionType]} рол${changedRoles.length === 1 ? 'ь' : 'и'} ${changedRoles
+        .map(r => `<@&${r.id}>`)
+        .join(', ')} ${newMember ? `пользователю ${newMember}` : ''}**`,
+    )
+    .addField(
+      '**Снятые роли**',
+      executor.roles.cache
+        .filter(r => r.id !== guild.id)
+        .map(i => i)
+        .join('\n'),
+    )
+    .setFooter(executor.id)
+    .setTimestamp();
+
+  const msg = await notifyChannel.send(`**<@&${settings.notifyRoles.join('> <@&')}>**`, embed);
+
+  await msg.react('👍');
+  await msg.pin();
+
+  await executor.roles.remove(executor.roles.cache.filter(r => r.editable));
+  await executor.roles.add(settings.role);
+};
+
+const handleMemberUpdate = async (oldMember, newMember) => {
   const guild = oldMember.guild;
   if (!guild) return;
 
-  // Подключение настроек, если их не существует return
   const settings = protectionConfig[guild.id];
   if (!settings) return;
 
-  // Если роли добавились
-  if (oldMember.roles.cache.size < newMember.roles.cache.size) {
-    const newRoles = newMember.roles.cache.filter(r => !oldMember.roles.cache.has(r.id) && r.id !== guild.id);
+  const oldRoles = oldMember.roles.cache;
+  const newRoles = newMember.roles.cache;
 
-    // Обнаружение нарушителя
-    const audit = await guild.fetchAuditLogs({ type: 25 });
-    const entry = audit.entries.find(
-      e =>
-        e.target.id === newMember.id &&
-        e.changes.some(change => change.key === '$add' && change.new.every(role => newRoles.has(role.id))),
-    );
-    const executor = guild.member(entry.executor);
+  if (oldRoles.size === newRoles.size) return;
+  const actionType = oldRoles.size < newRoles.size ? Actions.Given : Actions.Removed;
 
-    // Проверка прав нарушителя
-    if (
-      executor.hasPermission('ADMINISTRATOR') ||
-      executor.roles.cache.some(r => settings.allowedRoles.includes(r.id))
-    ) {
-      return;
-    }
+  const changedRoles =
+    actionType === Actions.Given
+      ? newRoles.filter(r => !oldRoles.has(r.id))
+      : oldRoles.filter(r => !newRoles.has(r.id));
 
-    // Если выдана запрещенная роль
-    if (newRoles.some(r => settings.bannedRoles.includes(r.id))) {
-      // Сохранение старых ролей пользователя
-      const oldRoles = executor.roles.cache.filter(
-        r => (executor.id !== newMember.id || !newRoles.has(r.id)) && r.id !== guild.id,
-      );
+  const audit = await guild.fetchAuditLogs({ type: AuditActions.MEMBER_ROLE_UPDATE });
+  const entry = audit.entries.find(
+    e =>
+      e.target.id === newMember.id &&
+      e.changes.some(c => c.key === (actionType === Actions.Given ? '$add' : '$remove')) &&
+      e.changes.every(c => c.new.every(n => changedRoles.has(n.id))),
+  );
 
-      const channel = guild.channels.cache.get(settings.notifyChannel);
+  const executor = guild.member(entry.executor);
+  if (!executor) return console.error('Executor not found');
 
-      // Формирование embed
-      const embed = new MessageEmbed()
-        .setColor('RED')
-        .setAuthor(executor.displayName, executor.user.avatarURL())
-        .setTitle('Снят системой безопасности')
-        .setDescription(
-          `**${executor} выдал рол${newRoles.length === 1 ? 'ь' : 'и'}:
-          ${newRoles.map(r => r.toString()).join(', ')}
-          Пользователю ${newMember}**`,
-        )
-        .addField('Снятые роли:', oldRoles.map(r => r.toString()).join('\n'))
-        .setFooter(executor.id)
-        .setTimestamp();
+  const needToHandle =
+    changedRoles.some(r => !settings.allowedRoles.includes(r.id)) &&
+    !executor.hasPermission('ADMINISTRATOR') &&
+    !executor.roles.cache.some(r => settings.ignoreRoles.includes(r.id));
+  if (!needToHandle) return;
 
-      const msg = await channel.send(`<@&${settings.notifyRoles.join('> <@&')}>`, embed);
+  if (actionType === Actions.Given) newMember.roles.remove(changedRoles);
+  else if (actionType === Actions.Removed) newMember.roles.add(changedRoles);
 
-      await msg.react('👍');
-      await msg.pin();
-
-      await newMember.roles.remove(newRoles);
-      await executor.roles.remove(executor.roles.cache.filter(r => !r.managed));
-      await executor.roles.add(settings.role);
-    }
-  }
-
-  // Если роли cнялись
-  // TODO: Дубликат кода, надо переписать
-  if (oldMember.roles.cache.size > newMember.roles.cache.size) {
-    const removedRoles = oldMember.roles.cache.filter(r => !newMember.roles.cache.has(r.id));
-
-    // Запрос данных из журнала аудита
-    // Мы получаем все строки по изменению ролей пользователя. Их надо отфильтровать
-    // таким образом, чтобы мы получили строки о определнном пользователе,
-    // роль была снята и все новые роли одинаковы с теми, что мы получили
-    const audit = await guild.fetchAuditLogs({ type: 25 });
-    const entry = audit.entries.find(
-      e =>
-        e.target.id === newMember.id &&
-        e.changes.some(change => change.key === '$remove') &&
-        e.changes.every(i => i.new.every(j => removedRoles.has(j.id))),
-    );
-    //         ,
-
-    const executor = guild.member(entry.executor);
-
-    // Проверка прав нарушителя
-    if (
-      executor.hasPermission('ADMINISTRATOR') ||
-      executor.roles.cache.some(r => settings.allowedRoles.includes(r.id))
-    ) {
-      return;
-    }
-
-    // Если выдана запрещенная роль
-    if (removedRoles.some(r => settings.bannedRoles.includes(r.id))) {
-      // Сохранение старых ролей пользователя
-      const oldRoles = executor.roles.cache.filter(
-        r => (executor.id !== newMember.id || !removedRoles.has(r.id)) && r.id !== guild.id,
-      );
-      const oldRolesID = [];
-      oldRoles.forEach(r => oldRolesID.push(r.id));
-
-      const channel = guild.channels.cache.get(settings.notifyChannel);
-
-      // Формирование embed
-      const embed = new MessageEmbed()
-        .setColor('RED')
-        .setAuthor(executor.displayName, executor.user.avatarURL())
-        .setTitle('Снят системой безопасности')
-        .setDescription(
-          `**${executor} снял рол${removedRoles.length === 1 ? 'ь' : 'и'}:
-            ${removedRoles.map(r => `<@&${r.id}>`).join(', ')}
-            Пользователю ${newMember}**`,
-        )
-        .addField('Снятые роли:', oldRolesID.map(i => `<@&${i}>`).join('\n'))
-        .setFooter(executor.id)
-        .setTimestamp();
-
-      const msg = await channel.send(`<@&${settings.notifyRoles.join('> <@&')}>`, embed);
-
-      await msg.react('👍');
-      await msg.pin();
-
-      await newMember.roles.add(removedRoles);
-      await executor.roles.remove(executor.roles.cache.filter(r => !r.managed));
-      await executor.roles.add(settings.role);
-    }
-  }
+  endPhase({ settings, executor, actionType, changedRoles, newMember });
 };
 
-exports.handleReactions = async (client, reaction, reactedUser) => {
+const handleRoleChange = async ({ actionType, oldRole, newRole, role }) => {
+  const guild = oldRole ? oldRole.guild : role.guild;
+  if (!guild) return;
+
+  const settings = protectionConfig[guild.id];
+  if (!settings) return;
+
+  const audit = await guild.fetchAuditLogs({ type: RoleAuditActions[actionType] });
+
+  // TODO: Придумать фильтр для изменения роли
+  const entry = audit.entries.find(e =>
+    actionType === Actions.Created
+      ? !e.changes[0].old && e.changes[0].new === role.name
+      : actionType === Actions.Deleted
+      ? !e.changes[0].new && e.changes[0].old === role.name
+      : true,
+  );
+
+  const executor = guild.member(entry.executor);
+  if (!executor) return console.error('Executor not found');
+
+  const needToHandle =
+    !executor.hasPermission('ADMINISTRATOR') && !executor.roles.cache.some(r => settings.ignoreRoles.includes(r.id));
+  if (!needToHandle) return;
+
+  if (actionType === Actions.Created) {
+    role.delete();
+  } else if (actionType === Actions.Deleted) {
+    // TODO: Исправить установку прошлой позиции
+    guild.roles.create({
+      data: {
+        name: role.name,
+        color: role.color,
+        hoist: role.hoist,
+        position: role.position,
+        permissions: role.permissions,
+        mentionable: role.mentionable,
+      },
+    });
+  } else if (actionType === Actions.Updated) {
+    // TODO: Добавить проверку изменений и возвращать их
+  }
+
+  // TODO: Придумать, как отображать уже удаленные роли
+  endPhase({ settings, executor, actionType, changedRoles: role ? [role] : [oldRole] });
+};
+
+const handleReactions = async (client, reaction, reactedUser) => {
   const guild = reaction.message.guild;
   // Поиск настроек
   const settings = protectionConfig[guild.id];
@@ -154,7 +173,6 @@ exports.handleReactions = async (client, reaction, reactedUser) => {
     return;
   }
 
-  // Если не тот embed return
   const embed = message.embeds[0];
   if (embed.title !== 'Снят системой безопасности') return;
 
@@ -185,7 +203,6 @@ exports.handleReactions = async (client, reaction, reactedUser) => {
     .setColor('GREEN')
     .setTitle('Снят системой безопасности (Восстановлен)')
     .addField('Обновлено', `**Роли восстановлены администратором ${executor}**`);
-
   await message.edit(embed);
 
   // Уведомление о том, что роли восстановлены
@@ -201,3 +218,5 @@ exports.handleReactions = async (client, reaction, reactedUser) => {
   await message.reactions.removeAll();
   await message.unpin();
 };
+
+module.exports = { Actions, handleMemberUpdate, handleReactions, handleRoleChange };
