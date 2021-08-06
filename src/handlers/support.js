@@ -12,7 +12,7 @@ exports.checkMainMessage = client => {
     if (!settings || !guildID) return console.error('Нет настроек #1');
 
     const guild = client.guilds.cache.get(guildID);
-    if (!guild) return console.error('Сервер не найден #2');
+    if (!guild) return;
 
     const channel = guild.channels.cache.get(settings.channelID);
     if (!channel) return console.error('Канал не найден #3');
@@ -183,8 +183,9 @@ exports.handleReactions = (client, reaction, reactedUser) => {
   const { message } = reaction;
   const member = message.guild.member(reactedUser);
   const isSupport = message.channel.id === settings.channelID;
-  const isTicket = message.channel.name.startsWith('ticket-') && Object.values(settings.categories).includes(message.channel.parentID)
-  
+  const isTicket =
+    message.channel.name.startsWith('ticket-') && Object.values(settings.categories).includes(message.channel.parentID);
+
   if ((reaction.emoji.name === '✏️' && !isSupport) || isTicket) {
     reaction.users.remove(member.user);
   }
@@ -203,7 +204,7 @@ exports.watchTickets = client => {
     if (!settings) return console.error('Нет настроек #100');
 
     const guild = client.guilds.cache.get(guildID);
-    if (!guild) return console.error('Сервер не найден #200');
+    if (!guild) return;
 
     const category = guild.channels.cache.get(settings.categories.close);
     if (!category) return console.error('Категория не найдена #300');
